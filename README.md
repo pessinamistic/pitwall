@@ -64,15 +64,22 @@ shapes what the agents do autonomously; it is not a security boundary.
 ```bash
 git clone <this-repo>
 cd <this-repo>
-./scripts/install.sh --profile personal   # or --profile work on a Copilot machine
+./bootstrap.sh            # auto-detects platforms + profile, prompts to confirm in a terminal
 ```
 
-If you omit `--profile`, the script auto-detects: any `github-copilot/*`
-entry in `opencode models` output selects `work`, otherwise `personal`, and
-the choice plus the reason is printed before anything happens. `--dry-run`
-prints every action without performing any. (This is the `--target default`
-path — the default when `--target` is omitted; see [Codex](#codex) below for
-`--target codex`/`all`.)
+`./bootstrap.sh` is a thin wrapper at the repo root that forwards every
+argument to `scripts/install.sh`, the real installer. It auto-detects both
+the profile (personal vs. work, from `opencode models`) and the target
+(adds Codex generation once the `codex` CLI is present), asks you to
+confirm the detected profile/target when run in a terminal, and finishes
+with a post-install verification pass (`scripts/validate.mjs` then
+`scripts/doctor.sh`). `--profile`, `--target`, and `--dry-run` still work as
+explicit overrides — see [Codex](#codex) below for `--target codex`/`all`.
+
+Before or after installing, `bash scripts/doctor.sh` is a standalone
+preflight/health check: it prints one `MISSING: <thing> (install: <cmd>)`
+line per problem (Node ≥ 20, OpenCode, `~/.claude`, Codex, live install
+symlinks), stays silent when everything is healthy, and always exits `0`.
 
 What the installer does, in order:
 
@@ -92,6 +99,9 @@ What the installer does, in order:
    Your existing keys (providers, MCP servers, …) win on every conflict
    except the `agent` block, where the profile's model routing wins.
    JSONC comments do not survive the merge; the backup keeps them.
+6. Re-runs `node scripts/validate.mjs` and `bash scripts/doctor.sh` as a
+   post-install verification pass, so you see immediately whether anything
+   is still missing.
 
 Everything is symlinked, not copied, so the repo stays the single source of
 truth and `git pull` updates your live setup. The script is safe to re-run.

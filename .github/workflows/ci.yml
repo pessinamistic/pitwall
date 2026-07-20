@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  drift-gate:
+    name: Validate + generated-file drift gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # Repo has zero npm dependencies (see README.md), so there is no
+      # `npm install` step and nothing to cache.
+      #
+      # Neither opencode nor codex is installed on the GitHub-hosted runner,
+      # so validate.mjs's live model-ID/slug checks (which shell out to
+      # `opencode models` / the Codex model list) are skipped with warnings
+      # here rather than failing — that is expected and non-fatal in CI; the
+      # steps below still catch contract errors and stale generated files.
+      - run: node scripts/validate.mjs --platform all
+      - run: node scripts/sync-agents.mjs --check
+      - run: node scripts/sync-codex-agents.mjs --check
+      # Explicit glob (not a bare directory): the bash shell expands it to the
+      # concrete scripts/lib/*.test.mjs files, which `node --test` runs on every
+      # Node >= 20. A bare directory arg is not portably scanned across Node
+      # versions (fails on Node 24), so pass the files explicitly.
+      - run: node --test scripts/lib/*.test.mjs

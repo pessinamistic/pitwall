@@ -15,14 +15,19 @@
 #   all                   default path, then the codex generation step
 #
 # With no --profile, the profile is auto-detected from `opencode models`
-# and the choice (and reason) is printed before anything happens.
+# and the choice (and reason) is printed before anything happens. With no
+# --target, the target is auto-detected too: "all" (adds codex generation)
+# if the codex CLI is on PATH, otherwise "default". When stdin is a TTY and
+# --dry-run was not given, any auto-detected (not explicitly flagged) value
+# is offered back for interactive confirmation/override.
 
 set -euo pipefail
 shopt -s nullglob
 
 PROFILE=""
 DRY_RUN=0
-TARGET="default"
+TARGET=""
+TARGET_EXPLICIT=0
 
 usage() {
   cat <<'USAGE'
@@ -42,10 +47,12 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --target)
       TARGET="${2:-}"
+      TARGET_EXPLICIT=1
       shift 2
       ;;
     --target=*)
       TARGET="${1#--target=}"
+      TARGET_EXPLICIT=1
       shift
       ;;
     --profile)
@@ -76,10 +83,40 @@ if [ -n "$PROFILE" ] && [ "$PROFILE" != "personal" ] && [ "$PROFILE" != "work" ]
   echo "install.sh: --profile must be \"personal\" or \"work\", got \"$PROFILE\"." >&2
   exit 1
 fi
-if [ "$TARGET" != "default" ] && [ "$TARGET" != "codex" ] && [ "$TARGET" != "all" ]; then
+if [ -n "$TARGET" ] && [ "$TARGET" != "default" ] && [ "$TARGET" != "codex" ] && [ "$TARGET" != "all" ]; then
   echo "install.sh: --target must be \"default\", \"codex\", or \"all\", got \"$TARGET\"." >&2
   exit 1
 fi
+
+# Captured before auto-detection overwrites PROFILE, so the interactive
+# prompt below only offers a confirmation for values that were *detected*,
+# never for one the user already pinned down with a flag.
+PROFILE_EXPLICIT=0
+[ -n "$PROFILE" ] && PROFILE_EXPLICIT=1
+
+# Prompt to confirm/override an auto-detected value, but only when stdin is
+# a TTY and --dry-run was not given — never for a non-interactive/CI run,
+# and never for a value the user already pinned with an explicit flag.
+prompt_confirm() {
+  # prompt_confirm <label> <detected-value> <valid-values-space-separated>
+  local label="$1" detected="$2" valid="$3" input=""
+  [ -t 0 ] || { printf '%s' "$detected"; return 0; }
+  [ "$DRY_RUN" = "1" ] && { printf '%s' "$detected"; return 0; }
+  read -r -p "$label [$valid] (Enter to accept \"$detected\"): " input || input=""
+  if [ -z "$input" ]; then
+    printf '%s' "$detected"
+    return 0
+  fi
+  local v
+  for v in $valid; do
+    if [ "$input" = "$v" ]; then
+      printf '%s' "$input"
+      return 0
+    fi
+  done
+  echo "install.sh: expected one of \"$valid\", got \"$input\"." >&2
+  exit 1
+}
 
 # Repo location is derived from this script's own path — never hardcoded —
 # so the script works regardless of where the repo is checked out or who
@@ -104,22 +141,49 @@ act() {
 }
 
 # ---------------------------------------------------------------------
+# 0. Determine the target.
+# ---------------------------------------------------------------------
+
+if [ "$TARGET_EXPLICIT" = "1" ]; then
+  TARGET_REASON="explicitly requested via --target $TARGET"
+else
+  if command -v codex >/dev/null 2>&1; then
+    DETECTED_TARGET="all"
+    TARGET_REASON="the codex CLI is on PATH, so target auto-detected as \"all\" (default path + codex generation)"
+  else
+    DETECTED_TARGET="default"
+    TARGET_REASON="the codex CLI is not on PATH, so target auto-detected as \"default\" (pass --target all if codex should also be generated)"
+  fi
+  TARGET="$(prompt_confirm 'Target' "$DETECTED_TARGET" 'default codex all')"
+  if [ "$TARGET" != "$DETECTED_TARGET" ]; then
+    TARGET_REASON="interactively overridden from auto-detected \"$DETECTED_TARGET\""
+  fi
+fi
+log "Selected target: $TARGET ($TARGET_REASON)"
+
+# ---------------------------------------------------------------------
 # 1. Determine the profile.
 # ---------------------------------------------------------------------
 
-if [ -n "$PROFILE" ]; then
+if [ "$PROFILE_EXPLICIT" = "1" ]; then
   REASON="explicitly requested via --profile $PROFILE"
-elif command -v opencode >/dev/null 2>&1; then
-  if opencode models 2>/dev/null | grep -q '^github-copilot/'; then
-    PROFILE="work"
-    REASON="\`opencode models\` on this machine lists a github-copilot/* entry"
-  else
-    PROFILE="personal"
-    REASON="\`opencode models\` on this machine lists no github-copilot/* entry"
-  fi
 else
-  PROFILE="personal"
-  REASON="opencode is not on PATH here, so model-based detection defaulted to personal (pass --profile work if this actually is the work machine)"
+  if command -v opencode >/dev/null 2>&1; then
+    if opencode models 2>/dev/null | grep -q '^github-copilot/'; then
+      DETECTED_PROFILE="work"
+      REASON="\`opencode models\` on this machine lists a github-copilot/* entry"
+    else
+      DETECTED_PROFILE="personal"
+      REASON="\`opencode models\` on this machine lists no github-copilot/* entry"
+    fi
+  else
+    DETECTED_PROFILE="personal"
+    REASON="opencode is not on PATH here, so model-based detection defaulted to personal (pass --profile work if this actually is the work machine)"
+  fi
+  PROFILE="$(prompt_confirm 'Profile' "$DETECTED_PROFILE" 'personal work')"
+  if [ "$PROFILE" != "$DETECTED_PROFILE" ]; then
+    REASON="interactively overridden from auto-detected \"$DETECTED_PROFILE\""
+  fi
 fi
 log "Selected profile: $PROFILE ($REASON)"
 
@@ -275,3 +339,20 @@ log "install.sh: done (target=$TARGET, profile=$PROFILE, dry-run=$DRY_RUN)."
 log "Confirm which model a subagent actually ran on if in doubt (see docs/model-routing.md) —"
 log "a partially-merged config degrades to the most expensive model silently,"
 log "not to an error."
+
+# ---------------------------------------------------------------------
+# 6. Post-install verify: re-run the health checks so a broken install is
+#    caught immediately instead of at the next agent invocation.
+#    validate.mjs is the hard check (its own abort-on-failure gate already
+#    ran earlier in this script; here its output is just surfaced, not
+#    re-enforced). doctor.sh is advisory and always exits 0.
+# ---------------------------------------------------------------------
+
+log ""
+log "Post-install verification:"
+if [ "$DRY_RUN" = "1" ]; then
+  log "[dry-run] would: run scripts/validate.mjs + scripts/doctor.sh (post-install verify)"
+else
+  node "$REPO_ROOT/scripts/validate.mjs" || true
+  bash "$REPO_ROOT/scripts/doctor.sh" || true
+fi

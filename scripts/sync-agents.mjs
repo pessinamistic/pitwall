@@ -3,7 +3,11 @@
 // "Claude Code mirrors"). Zero npm dependencies (Node >= 20).
 //
 // Usage:
-//   node scripts/sync-agents.mjs [--profile personal|work]
+//   node scripts/sync-agents.mjs [--profile personal|work] [--check]
+//
+// --check writes nothing and exits nonzero if any generated mirror under
+// .claude/agents/ is stale or missing relative to its agents/*.md source
+// (CI mode).
 //
 // The OpenCode agent files carry no `model:` key by design (see
 // docs/model-routing.md) — OpenCode routing lives only in
@@ -79,19 +83,25 @@ const SHORTHAND_DENY_TOOL_MAP = {
 
 function parseArgs(argv) {
   let profile = 'personal';
+  let check = false;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--profile') {
       profile = argv[i + 1];
       i++;
     } else if (argv[i].startsWith('--profile=')) {
       profile = argv[i].slice('--profile='.length);
+    } else if (argv[i] === '--check') {
+      check = true;
+    } else {
+      console.error(`sync-agents.mjs: unknown argument "${argv[i]}".`);
+      process.exit(1);
     }
   }
   if (profile !== 'personal' && profile !== 'work') {
     console.error(`sync-agents.mjs: --profile must be "personal" or "work", got "${profile}".`);
     process.exit(1);
   }
-  return { profile };
+  return { profile, check };
 }
 
 function escapeYamlDoubleQuoted(s) {
@@ -172,7 +182,7 @@ function buildGeneratedFile(sourceName, frontmatter, body, modelAlias) {
 }
 
 function main() {
-  const { profile } = parseArgs(process.argv.slice(2));
+  const { profile, check } = parseArgs(process.argv.slice(2));
 
   const agentsDir = path.join(REPO_ROOT, 'agents');
   const outDir = path.join(REPO_ROOT, '.claude', 'agents');
@@ -180,7 +190,7 @@ function main() {
     console.error(`sync-agents.mjs: agents/ directory does not exist at ${agentsDir}`);
     process.exit(1);
   }
-  fs.mkdirSync(outDir, { recursive: true });
+  if (!check) fs.mkdirSync(outDir, { recursive: true });
 
   const files = fs.readdirSync(agentsDir).filter((f) => f.endsWith('.md') && f !== '.gitkeep');
   if (files.length === 0) {
@@ -190,6 +200,7 @@ function main() {
 
   let written = 0;
   let unchanged = 0;
+  let stale = 0;
   for (const file of files) {
     const name = file.replace(/\.md$/, '');
     const raw = fs.readFileSync(path.join(agentsDir, file), 'utf8');
@@ -224,10 +235,26 @@ function main() {
       unchanged++;
       continue;
     }
+    if (check) {
+      stale++;
+      console.error(
+        `sync-agents.mjs: .claude/agents/${file} is ${existing === null ? 'missing' : 'stale'} ` +
+          `— re-run \`node scripts/sync-agents.mjs\`.`
+      );
+      continue;
+    }
     fs.writeFileSync(outPath, output);
     written++;
   }
 
+  if (check) {
+    if (stale) {
+      console.error(`sync-agents.mjs --check: ${stale} file(s) out of date.`);
+      process.exit(1);
+    }
+    console.log(`sync-agents.mjs --check: all ${files.length} generated files up to date (profile=${profile}).`);
+    return;
+  }
   console.log(
     `sync-agents.mjs: ${written} file(s) written, ${unchanged} unchanged, ` +
       `${files.length} source file(s) total (profile flag "${profile}" accepted for ` +

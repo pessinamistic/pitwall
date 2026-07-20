@@ -15,13 +15,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { parseJsonc } from './jsonc.mjs';
-
-const [, , existingPath, profilePath, outputPath] = process.argv;
-if (!existingPath || !profilePath || !outputPath) {
-  console.error('Usage: node merge-config.mjs <existingConfigPath> <profileConfigPath> <outputPath>');
-  process.exit(1);
-}
 
 function isPlainObject(v) {
   return v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -30,7 +25,7 @@ function isPlainObject(v) {
 // Inside the "agent" block: the profile wins on any leaf conflict, but
 // keys that only exist on one side (e.g. a 7th agent the user added by
 // hand, or an unrelated top-level agent key) are kept.
-function mergeAgentWins(existing, incoming) {
+export function mergeAgentWins(existing, incoming) {
   const result = { ...(existing || {}) };
   for (const key of Object.keys(incoming)) {
     if (isPlainObject(existing ? existing[key] : undefined) && isPlainObject(incoming[key])) {
@@ -44,7 +39,7 @@ function mergeAgentWins(existing, incoming) {
 
 // Everywhere else: existing wins on any leaf conflict; only keys missing
 // from existing get filled in from the profile.
-function mergeExistingWins(existing, incoming) {
+export function mergeExistingWins(existing, incoming) {
   const result = { ...(existing || {}) };
   for (const key of Object.keys(incoming)) {
     if (!(key in result)) {
@@ -57,26 +52,45 @@ function mergeExistingWins(existing, incoming) {
   return result;
 }
 
-const existing = parseJsonc(fs.readFileSync(existingPath, 'utf8'));
-const profile = parseJsonc(fs.readFileSync(profilePath, 'utf8'));
-
-const merged = { ...existing };
-for (const key of Object.keys(profile)) {
-  if (key === 'agent') {
-    merged.agent = mergeAgentWins(existing.agent || {}, profile.agent || {});
-  } else if (!(key in existing)) {
-    merged[key] = profile[key];
-  } else if (isPlainObject(existing[key]) && isPlainObject(profile[key])) {
-    merged[key] = mergeExistingWins(existing[key], profile[key]);
+// Merges a parsed profile config onto a parsed existing config, applying
+// mergeAgentWins inside "agent" and mergeExistingWins everywhere else.
+export function mergeConfigs(existing, profile) {
+  const merged = { ...existing };
+  for (const key of Object.keys(profile)) {
+    if (key === 'agent') {
+      merged.agent = mergeAgentWins(existing.agent || {}, profile.agent || {});
+    } else if (!(key in existing)) {
+      merged[key] = profile[key];
+    } else if (isPlainObject(existing[key]) && isPlainObject(profile[key])) {
+      merged[key] = mergeExistingWins(existing[key], profile[key]);
+    }
+    // else: existing wins, nothing to do.
   }
-  // else: existing wins, nothing to do.
+  return merged;
 }
 
-const header =
-  `// Merged by scripts/install.sh from ${path.basename(profilePath)} on ${new Date().toISOString()}.\n` +
-  '// Comments from both the pre-existing file and the profile were dropped by this\n' +
-  "// merge (JSONC comments can't survive a parse/stringify round-trip). The\n" +
-  '// pre-merge original was backed up first; see the install.sh output for its path.\n';
+function main() {
+  const [, , existingPath, profilePath, outputPath] = process.argv;
+  if (!existingPath || !profilePath || !outputPath) {
+    console.error('Usage: node merge-config.mjs <existingConfigPath> <profileConfigPath> <outputPath>');
+    process.exit(1);
+  }
 
-fs.writeFileSync(outputPath, header + JSON.stringify(merged, null, 2) + '\n');
-console.log(`merge-config.mjs: wrote ${outputPath}`);
+  const existing = parseJsonc(fs.readFileSync(existingPath, 'utf8'));
+  const profile = parseJsonc(fs.readFileSync(profilePath, 'utf8'));
+
+  const merged = mergeConfigs(existing, profile);
+
+  const header =
+    `// Merged by scripts/install.sh from ${path.basename(profilePath)} on ${new Date().toISOString()}.\n` +
+    '// Comments from both the pre-existing file and the profile were dropped by this\n' +
+    "// merge (JSONC comments can't survive a parse/stringify round-trip). The\n" +
+    '// pre-merge original was backed up first; see the install.sh output for its path.\n';
+
+  fs.writeFileSync(outputPath, header + JSON.stringify(merged, null, 2) + '\n');
+  console.log(`merge-config.mjs: wrote ${outputPath}`);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

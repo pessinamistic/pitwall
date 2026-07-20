@@ -17,3 +17,6 @@ benchmarks/results/*
 
 # local backups made by install.sh
 *.bak
+
+# tech-lead session handoff notes — not part of the public repo
+TECH_LEAD_HANDOFF.md
