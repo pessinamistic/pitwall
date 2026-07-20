@@ -1,0 +1,196 @@
+{
+  "_disclaimer": "Copilot bills by premium-request quota, not tokens - these figures are a proxy for relative cost efficiency, not a bill. Separately, the github-copilot/* keys in this file are best-effort model-ID slugs derived from Copilot's public model-picker display names (see docs.github.com/en/copilot/reference/ai-models/supported-models); they are NOT verified OpenCode provider IDs. Per docs/model-routing.md, the real IDs must be copied verbatim from `opencode models | grep -i copilot` run on the work machine before they are used in config/opencode.work.jsonc or passed to run.mjs - guessed IDs will fail at invocation time.",
+
+  "github-copilot/claude-fable-5": {
+    "input_per_mtok": 10,
+    "output_per_mtok": 50,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+  "github-copilot/claude-opus-4-8": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 25,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard pricing; fast-mode preview is priced separately ($10/$50)."
+  },
+  "github-copilot/claude-opus-4-7": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 25,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard pricing; fast-mode is priced separately ($30/$150) and is deprecated 2026-07-24."
+  },
+  "github-copilot/claude-opus-4-6": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 25,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+  "github-copilot/claude-opus-4-5": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 25,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+  "github-copilot/claude-sonnet-5": {
+    "input_per_mtok": 2,
+    "output_per_mtok": 10,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Introductory pricing in effect through 2026-08-31. Rises to $3/$15 per MTok on 2026-09-01 - update this entry after that date."
+  },
+  "github-copilot/claude-sonnet-4-6": {
+    "input_per_mtok": 3,
+    "output_per_mtok": 15,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+  "github-copilot/claude-sonnet-4-5": {
+    "input_per_mtok": 3,
+    "output_per_mtok": 15,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+  "github-copilot/claude-haiku-4-5": {
+    "input_per_mtok": 1,
+    "output_per_mtok": 5,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard (non-batch) API pricing."
+  },
+
+  "github-copilot/gpt-5-6-sol": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 30,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-6-terra": {
+    "input_per_mtok": 2.5,
+    "output_per_mtok": 15,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-6-luna": {
+    "input_per_mtok": 1,
+    "output_per_mtok": 6,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-5": {
+    "input_per_mtok": 5,
+    "output_per_mtok": 30,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Distinct from gpt-5.5-pro ($30/$180), which is a separate higher tier."
+  },
+  "github-copilot/gpt-5-4": {
+    "input_per_mtok": 2.5,
+    "output_per_mtok": 15,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-4-mini": {
+    "input_per_mtok": 0.75,
+    "output_per_mtok": 4.5,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-4-nano": {
+    "input_per_mtok": 0.2,
+    "output_per_mtok": 1.25,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-3-codex": {
+    "input_per_mtok": 1.75,
+    "output_per_mtok": 14,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": ""
+  },
+  "github-copilot/gpt-5-mini": {
+    "input_per_mtok": null,
+    "output_per_mtok": null,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Copilot's model picker lists a plain 'GPT-5 mini' but the current OpenAI pricing page only shows versioned mini/nano SKUs (gpt-5.4-mini, gpt-5.4-nano). Left null rather than guessing which underlying SKU it maps to - use gpt-5.4-mini as a rough proxy if needed."
+  },
+
+  "github-copilot/gemini-3-5-flash": {
+    "input_per_mtok": 1.5,
+    "output_per_mtok": 9,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard tier."
+  },
+  "github-copilot/gemini-3-1-flash-lite": {
+    "input_per_mtok": 0.25,
+    "output_per_mtok": 1.5,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Text/image/video input rate; audio input is $0.50/MTok."
+  },
+  "github-copilot/gemini-3-flash": {
+    "input_per_mtok": null,
+    "output_per_mtok": null,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Copilot lists 'Gemini 3 Flash' (public preview) but no distinct line item by that exact name was found on the Gemini pricing page at fetch time - nearest priced tiers are Gemini 3.1 Flash-Lite and Gemini 3.5 Flash. Left null rather than guessing."
+  },
+  "github-copilot/gemini-3-1-pro": {
+    "input_per_mtok": 2,
+    "output_per_mtok": 12,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Preview pricing, <=200k-token prompts. Prompts >200k tokens are billed at $4/$18 per MTok instead."
+  },
+  "github-copilot/gemini-2-5-flash": {
+    "input_per_mtok": 0.3,
+    "output_per_mtok": 2.5,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard tier."
+  },
+  "github-copilot/gemini-2-5-flash-lite": {
+    "input_per_mtok": 0.1,
+    "output_per_mtok": 0.4,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "Standard tier."
+  },
+  "github-copilot/gemini-2-5-pro": {
+    "input_per_mtok": 1.25,
+    "output_per_mtok": 10,
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "as_of": "2026-07-19",
+    "notes": "<=200k-token prompts. Prompts >200k tokens are billed at $2.50/$15 per MTok instead."
+  },
+
+  "opencode/big-pickle": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "opencode/deepseek-v4-flash-free": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "opencode/hy3-free": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "opencode/mimo-v2.5-free": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "opencode/nemotron-3-ultra-free": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "opencode/north-mini-code-free": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama/deepseek-r1:7b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama/qwen3.5:27b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/codellama:7b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/deepseek-coder-v2:16b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/gemma2:2b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/gemma4:12b-mlx": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/llama3.2:1b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" },
+  "ollama-local/qwen2.5-coder:7b": { "input_per_mtok": null, "output_per_mtok": null, "source": "n/a", "as_of": "2026-07-19", "notes": "local/free - no per-token price" }
+}

@@ -1,0 +1,19 @@
+# local working notes — contain machine-specific details, not part of the public repo
+IMPLEMENTATION_PLAN.md
+chatgpt_output.txt
+
+# editors / OS
+.idea/
+.vscode/
+*.un~
+.DS_Store
+
+# node
+node_modules/
+
+# benchmark output (keep the directory, ignore the runs)
+benchmarks/results/*
+!benchmarks/results/.gitkeep
+
+# local backups made by install.sh
+*.bak

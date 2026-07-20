@@ -1,0 +1,27 @@
+{
+  // Generator INPUT for scripts/sync-codex-agents.mjs — Codex never reads
+  // this file. It maps each role to the model / reasoning-effort / sandbox
+  // values baked into the generated .codex/agents/<role>.toml files.
+  //
+  // Every model slug below was verified against this machine's live Codex
+  // model list (~/.codex/models_cache.json, fetched by codex-cli 0.144.6)
+  // on 2026-07-20. Current visible slugs here: gpt-5.5 (frontier),
+  // gpt-5.6-terra (balanced everyday), gpt-5.6-luna (fast/affordable).
+  // Note: the documented flagship gpt-5.6-sol is NOT exposed on this
+  // account, and bare "gpt-5.6" is not a real slug — do not guess IDs;
+  // check the models cache or the /model picker.
+  //
+  // Tier intent mirrors the OpenCode/Claude ladders (docs/model-routing.md):
+  // strongest -> tech-lead & senior-dev, mid -> implementer/code-reviewer/
+  // debugger (reviewer & debugger get higher reasoning effort instead of a
+  // bigger model), cheapest -> boilerplate.
+  "agent": {
+    "tech-lead":     { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
+    "senior-dev":    { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
+    "implementer":   { "model": "gpt-5.6-terra", "model_reasoning_effort": "medium" }, // balanced mid
+    "boilerplate":   { "model": "gpt-5.6-luna",  "model_reasoning_effort": "low" },    // cheapest
+    "code-reviewer": { "model": "gpt-5.6-terra", "model_reasoning_effort": "high",     // mid + high reasoning
+                       "sandbox_mode": "read-only" },                                  // reviewer must not edit
+    "debugger":      { "model": "gpt-5.6-terra", "model_reasoning_effort": "high" }    // mid + high reasoning
+  }
+}

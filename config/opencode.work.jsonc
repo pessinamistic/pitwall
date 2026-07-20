@@ -1,0 +1,34 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // WORK MACHINE TEMPLATE — every "TODO" below must be replaced before this
+  // profile is usable. On the work machine, run:
+  //
+  //   opencode models | grep -i copilot
+  //
+  // and paste the verbatim IDs from that output into docs/model-routing.md
+  // and into the slots below. Copilot's marketing names ("Claude Sonnet
+  // 4.6", "GPT-5.4", etc.) are NOT OpenCode model IDs — guessing them
+  // produces a config that fails at invocation time with an unhelpful
+  // error. Only strings copied verbatim from `opencode models` are valid.
+  //
+  // Tier intent per role — see docs/model-routing.md. Fill each TODO with a model
+  // that satisfies the tier comment on its line, not just any Copilot ID.
+  "model": "TODO", // strongest available — same model as tech-lead below
+
+  "permission": {
+    "skill": { "*": "allow" }
+  },
+
+  "agent": {
+    "tech-lead":     { "model": "TODO" }, // strongest available
+    "senior-dev":    { "model": "TODO" }, // strong mid
+    "implementer":   { "model": "TODO" }, // code-tuned mid
+    "boilerplate":   { "model": "TODO" }, // cheapest available
+    "code-reviewer": { "model": "TODO" }, // reasoning-tuned
+    "debugger":      { "model": "TODO" }, // reasoning-tuned
+
+    // Built-in — keep cheap so it doesn't compete with tech-lead.
+    "plan": { "model": "TODO" } // cheapest available
+  }
+}
