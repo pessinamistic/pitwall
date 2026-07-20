@@ -11,8 +11,8 @@
 
   "agent": {
     "tech-lead":     { "model": "github-copilot/claude-sonnet-5" }, // strongest available
-    "senior-dev":    { "model": "github-copilot/claude-sonnet-5" }, // strong mid
-    "implementer":   { "model": "github-copilot/claude-sonnet-4.6" }, // code-tuned mid
+    "senior-dev":    { "model": "github-copilot/claude-sonnet-4.6" }, // strong mid
+    "implementer":   { "model": "github-copilot/claude-sonnet-4.5" }, // code-tuned mid
     "boilerplate":   { "model": "github-copilot/claude-haiku-4.5" }, // cheapest available
     "code-reviewer": { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
     "debugger":      { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned

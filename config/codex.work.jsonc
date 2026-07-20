@@ -12,12 +12,12 @@
   // Reasoning efforts are real values, kept from the tier intent — only the
   // model slugs need filling. validate.mjs warns (not fails) on TODOs here.
   "agent": {
-    "tech-lead":     { "model": "TODO", "model_reasoning_effort": "high" },   // strongest available
-    "senior-dev":    { "model": "TODO", "model_reasoning_effort": "high" },   // strongest available
-    "implementer":   { "model": "TODO", "model_reasoning_effort": "medium" }, // balanced mid
-    "boilerplate":   { "model": "TODO", "model_reasoning_effort": "low" },    // cheapest available
-    "code-reviewer": { "model": "TODO", "model_reasoning_effort": "high",     // mid + high reasoning
-                       "sandbox_mode": "read-only" },                         // reviewer must not edit
-    "debugger":      { "model": "TODO", "model_reasoning_effort": "high" }    // mid + high reasoning
+    "tech-lead":     { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
+    "senior-dev":    { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
+    "implementer":   { "model": "gpt-5.6-terra", "model_reasoning_effort": "medium" }, // balanced mid
+    "boilerplate":   { "model": "gpt-5.6-luna",  "model_reasoning_effort": "low" },    // cheapest
+    "code-reviewer": { "model": "gpt-5.6-terra", "model_reasoning_effort": "high",     // mid + high reasoning
+      "sandbox_mode": "read-only" },                                  // reviewer must not edit
+    "debugger":      { "model": "gpt-5.6-terra", "model_reasoning_effort": "high" }    // mid + high reasoning
   }
 }
