@@ -3,22 +3,22 @@
 
   // Tier intent per role — see docs/model-routing.md. If you change a model here,
   // check it still satisfies the intent comment on its line.
-  "model": "opencode/big-pickle",
+  "model": "github-copilot/claude-sonnet-5",
 
   "permission": {
     "skill": { "*": "allow" }
   },
 
   "agent": {
-    "tech-lead":     { "model": "opencode/big-pickle" },              // strongest
-    "senior-dev":    { "model": "ollama/qwen3.5:27b" },               // large — remote Ollama host — see your provider config
-    "implementer":   { "model": "ollama-local/qwen2.5-coder:7b" },    // mid, code-tuned
-    "boilerplate":   { "model": "ollama-local/gemma2:2b" },           // cheapest
-    "code-reviewer": { "model": "ollama/deepseek-r1:7b" },            // reasoning — remote Ollama host — see your provider config
-    "debugger":      { "model": "ollama/deepseek-r1:7b" },            // reasoning — remote Ollama host — see your provider config
+    "tech-lead":     { "model": "github-copilot/claude-sonnet-5" }, // strongest available
+    "senior-dev":    { "model": "github-copilot/claude-sonnet-5" }, // strong mid
+    "implementer":   { "model": "github-copilot/claude-sonnet-4.6" }, // code-tuned mid
+    "boilerplate":   { "model": "github-copilot/claude-haiku-4.5" }, // cheapest available
+    "code-reviewer": { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
+    "debugger":      { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
 
     // Built-in — keep cheap so it doesn't compete with tech-lead.
-    "plan": { "model": "ollama-local/qwen2.5-coder:7b" }
+    "plan": { "model": "github-copilot/claude-haiku-4.5" } // cheapest available
   }
 
   // senior-dev, code-reviewer, and debugger all route to the remote Ollama

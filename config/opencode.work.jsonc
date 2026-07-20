@@ -14,21 +14,21 @@
   //
   // Tier intent per role — see docs/model-routing.md. Fill each TODO with a model
   // that satisfies the tier comment on its line, not just any Copilot ID.
-  "model": "TODO", // strongest available — same model as tech-lead below
+  "model": "github-copilot/claude-sonnet-5", // strongest available — same model as tech-lead below
 
   "permission": {
     "skill": { "*": "allow" }
   },
 
   "agent": {
-    "tech-lead":     { "model": "TODO" }, // strongest available
-    "senior-dev":    { "model": "TODO" }, // strong mid
-    "implementer":   { "model": "TODO" }, // code-tuned mid
-    "boilerplate":   { "model": "TODO" }, // cheapest available
-    "code-reviewer": { "model": "TODO" }, // reasoning-tuned
-    "debugger":      { "model": "TODO" }, // reasoning-tuned
+    "tech-lead":     { "model": "github-copilot/claude-sonnet-5" }, // strongest available
+    "senior-dev":    { "model": "github-copilot/claude-sonnet-5" }, // strong mid
+    "implementer":   { "model": "github-copilot/claude-sonnet-4.6" }, // code-tuned mid
+    "boilerplate":   { "model": "github-copilot/claude-haiku-4.5" }, // cheapest available
+    "code-reviewer": { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
+    "debugger":      { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
 
     // Built-in — keep cheap so it doesn't compete with tech-lead.
-    "plan": { "model": "TODO" } // cheapest available
+    "plan": { "model": "github-copilot/claude-haiku-4.5" } // cheapest available
   }
 }
