@@ -25,7 +25,12 @@ stays the single source of truth — edit here, not under `~/.gemini/`.
 |------|-------------|---------|
 | `antigravity/skill/SKILL.md` | `~/.gemini/skills/engineering-team/SKILL.md` | Antigravity skill definition — documentation, hierarchy, model routing reference |
 | `antigravity/rules/engineering-team.md` | `~/.gemini/rules/engineering-team.md` | Rule that teaches Antigravity how to `define_subagent` for each agent on-demand |
+| every `.claude/skills/<name>/` directory | `~/.gemini/skills/<name>/` | Generalized mirror — every shared skill (`delegate-first`, `java`, `kafka`, ...) is symlinked in, so a skill added under `.claude/skills/` reaches Antigravity with no separate install step |
 | `antigravity/install.sh` | *(not installed)* | The installer itself |
+
+The generalized mirror loops over `.claude/skills/*/` at install time, so it
+never needs updating when a new skill is added there — see
+`docs/adding-a-skill.md`.
 
 ## Agent → Antigravity Mapping
 

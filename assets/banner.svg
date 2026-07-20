@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" width="1200" height="260" role="img" aria-label="Scuderia — a stable of engineering agents, brief one, ship with the crew">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE07A"/><stop offset="1" stop-color="#E9A400"/>
+    </linearGradient>
+    <linearGradient id="mb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141014"/><stop offset=".5" stop-color="#0a0b0e"/><stop offset="1" stop-color="#1c0409"/>
+    </linearGradient>
+    <pattern id="chk" width="24" height="12" patternUnits="userSpaceOnUse">
+      <rect width="24" height="12" fill="#0a0b0e"/>
+      <rect width="12" height="6" fill="#ffffff"/><rect x="12" y="6" width="12" height="6" fill="#ffffff"/>
+    </pattern>
+    <clipPath id="arc"><path d="M79,130 A71,71 0 0 1 221,130 Z"/></clipPath>
+  </defs>
+
+  <rect width="1200" height="260" fill="url(#mb)"/>
+  <text x="1060" y="238" text-anchor="middle" font-family="'Arial Narrow',Arial,sans-serif" font-style="italic" font-weight="800" font-size="300" fill="#ffffff" opacity="0.05">5</text>
+
+  <!-- roundel -->
+  <circle cx="150" cy="130" r="71" fill="#0d0d0f"/>
+  <circle cx="150" cy="130" r="71" fill="none" stroke="url(#g)" stroke-width="3"/>
+  <circle cx="150" cy="130" r="63" fill="none" stroke="url(#g)" stroke-width="1" opacity="0.5"/>
+  <g clip-path="url(#arc)"><rect x="79" y="59" width="142" height="71" fill="url(#chk)" opacity="0.9"/></g>
+  <text x="150" y="167" text-anchor="middle" font-family="'Arial Narrow',Helvetica,Arial,sans-serif" font-style="italic" font-weight="800" font-size="95" fill="url(#g)">S</text>
+
+  <!-- tricolore -->
+  <rect x="392" y="52" width="46" height="8" fill="#00913A"/><rect x="438" y="52" width="46" height="8" fill="#F2F3F0"/><rect x="484" y="52" width="46" height="8" fill="#CD2130"/>
+
+  <!-- wordmark -->
+  <text x="388" y="150" font-family="'Arial Narrow',Helvetica,Arial,sans-serif" font-style="italic" font-weight="800" font-size="96" letter-spacing="5" fill="#ffffff">SCUDERIA</text>
+  <rect x="392" y="168" width="440" height="3" fill="#E2001A"/>
+  <text x="394" y="200" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="23" fill="#f2f3f0" opacity="0.92">a stable of engineering agents — brief one, ship with the crew</text>
+  <text x="394" y="232" font-family="'SF Mono',Menlo,monospace" font-size="17" fill="#FFC400" letter-spacing="1.5">// delegate · build · verify — Forza Ferrari</text>
+
+  <rect x="0" y="248" width="1200" height="12" fill="url(#chk)"/>
+</svg>

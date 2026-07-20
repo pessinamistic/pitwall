@@ -1,5 +1,7 @@
 # opencode-engineering-team
 
+*Six roles, one pit wall.*
+
 An orchestrated engineering team for [OpenCode](https://opencode.ai): a
 `tech-lead` agent that plans and delegates, five worker agents that execute,
 and per-role model routing that puts each role on the cheapest model that can
@@ -22,16 +24,20 @@ Three things make this more than six prompt files:
   command) is what keeps worker token spend down; model tiering is the
   second-order saving. See [docs/writing-briefs.md](docs/writing-briefs.md).
 
+Rosso Corsa flavor aside, the hierarchy below is the same shape Maranello
+would recognize: a Race Engineer calling strategy, a Technical Director for
+the hard calls, and a garage crew that executes.
+
 ## The team
 
-| Agent | Role | Tier intent | The tech lead routes here when… |
-|---|---|---|---|
-| `tech-lead` | Primary orchestrator: decomposes requests, writes briefs, sequences work, enforces review, reports status | strongest available | — (this is the entry point; every multi-step request starts here) |
-| `senior-dev` | Design, security config, schema/migrations, messaging, caching, concurrency; reviews risky diffs | large / strong mid | the task needs judgment: architecture, auth, schema design, async pipelines, or an architectural read on a diff |
-| `implementer` | Well-scoped feature work: CRUD endpoints, DTOs/mappers, UI from the existing design system, standard tests, Docker/CI yaml | code-tuned mid | the task is fully specified and needs no design decisions — it stops and punts if one appears |
-| `boilerplate` | Mechanical work: config files, entity/DTO shells, fixtures, renames, repetitive near-identical files | cheapest available | there is zero judgment involved; capped at 20 agentic steps so a misroute fails loudly instead of burning budget |
-| `code-reviewer` | Reviews a diff and reports numbered `file:line` findings with severity — never edits | reasoning-tuned | it wants pure review signal on another agent's output, without the fix being silently applied |
-| `debugger` | Reproduce → isolate → diagnose → minimal fix, with root cause and fix reported separately | reasoning-tuned | something is broken and the cause is unknown (known-cause changes go to `implementer`/`senior-dev` instead) |
+| Agent           | Role                                                                                                                       | Tier intent         | The tech lead routes here when…                                                                                  |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------------------------------------------------------------------------------|
+| `tech-lead`     | Primary orchestrator: decomposes requests, writes briefs, sequences work, enforces review, reports status                  | strongest available | — (this is the entry point; every multi-step request starts here)                                                |
+| `senior-dev`    | Design, security config, schema/migrations, messaging, caching, concurrency; reviews risky diffs                           | large / strong mid  | the task needs judgment: architecture, auth, schema design, async pipelines, or an architectural read on a diff  |
+| `implementer`   | Well-scoped feature work: CRUD endpoints, DTOs/mappers, UI from the existing design system, standard tests, Docker/CI yaml | code-tuned mid      | the task is fully specified and needs no design decisions — it stops and punts if one appears                    |
+| `boilerplate`   | Mechanical work: config files, entity/DTO shells, fixtures, renames, repetitive near-identical files                       | cheapest available  | there is zero judgment involved; capped at 20 agentic steps so a misroute fails loudly instead of burning budget |
+| `code-reviewer` | Reviews a diff and reports numbered `file:line` findings with severity — never edits                                       | reasoning-tuned     | it wants pure review signal on another agent's output, without the fix being silently applied                    |
+| `debugger`      | Reproduce → isolate → diagnose → minimal fix, with root cause and fix reported separately                                  | reasoning-tuned     | something is broken and the cause is unknown (known-cause changes go to `implementer`/`senior-dev` instead)      |
 
 ## How orchestration is enforced
 
@@ -69,39 +75,53 @@ cd <this-repo>
 
 `./bootstrap.sh` is a thin wrapper at the repo root that forwards every
 argument to `scripts/install.sh`, the real installer. It auto-detects both
-the profile (personal vs. work, from `opencode models`) and the target
-(adds Codex generation once the `codex` CLI is present), asks you to
-confirm the detected profile/target when run in a terminal, and finishes
-with a post-install verification pass (`scripts/validate.mjs` then
-`scripts/doctor.sh`). `--profile`, `--target`, and `--dry-run` still work as
-explicit overrides — see [Codex](#codex) below for `--target codex`/`all`.
+the profile (personal vs. work, from `opencode models`) and the target: the
+set of harnesses actually present on this machine (OpenCode, Claude Code,
+Codex, and/or Antigravity/Gemini), asks you to confirm the detected
+profile/target when run in a terminal, and finishes with a post-install
+verification pass (`scripts/validate.mjs` then `scripts/doctor.sh`).
+`--profile`, `--target`, and `--dry-run` still work as explicit overrides.
+
+`--target` is a comma-separated list of any subset of `opencode`, `claude`,
+`codex`, `antigravity` (alias: `gemini`), run in that fixed order. Two
+backward-compatible aliases: `default` (also the auto-detect fallback when
+nothing is detected) = `opencode,claude`; `all` = `opencode,claude,codex,antigravity`
+— **note this is a behavior change**: `all` now also runs the
+antigravity/gemini step, which it did not before — see [Codex](#codex) below
+for `--target codex`/`all`.
 
 Before or after installing, `bash scripts/doctor.sh` is a standalone
 preflight/health check: it prints one `MISSING: <thing> (install: <cmd>)`
 line per problem (Node ≥ 20, OpenCode, `~/.claude`, Codex, live install
 symlinks), stays silent when everything is healthy, and always exits `0`.
 
-What the installer does, in order:
+What the installer does, per selected step, always in this fixed order
+regardless of the order given on the command line:
 
-1. Runs `node scripts/validate.mjs` and aborts if it fails.
-2. Regenerates the Claude Code agent mirrors
-   (`node scripts/sync-agents.mjs --profile <p>`) — the `--profile` flag is
-   accepted for CLI compatibility but no longer changes mirror content; see
-   "Claude Code mirrors" below.
-3. **Backs up** any existing `~/.config/opencode/agents/` and
-   `~/.claude/agents/` to a timestamped `.bak.<timestamp>` sibling, then
-   symlinks the repo's agents into both.
-4. Symlinks each skill directory into `~/.claude/skills/`, one at a time —
-   an existing real (non-symlink) skill directory of the same name is
-   skipped with a warning, never overwritten.
-5. Merges the chosen `config/opencode.<profile>.jsonc` into
-   `~/.config/opencode/opencode.jsonc`, **after backing the original up**.
-   Your existing keys (providers, MCP servers, …) win on every conflict
-   except the `agent` block, where the profile's model routing wins.
-   JSONC comments do not survive the merge; the backup keeps them.
-6. Re-runs `node scripts/validate.mjs` and `bash scripts/doctor.sh` as a
-   post-install verification pass, so you see immediately whether anything
-   is still missing.
+1. **`opencode`** (part of `default`/`all`): runs `node scripts/validate.mjs`
+   (the full contract check) and aborts if it fails, **backs up** any
+   existing `~/.config/opencode/agents/` to a timestamped `.bak.<timestamp>`
+   sibling and symlinks the repo's agents in, then merges the chosen
+   `config/opencode.<profile>.jsonc` into `~/.config/opencode/opencode.jsonc`
+   **after backing the original up**. Your existing keys (providers, MCP
+   servers, …) win on every conflict except the `agent` block, where the
+   profile's model routing wins. JSONC comments do not survive the merge;
+   the backup keeps them.
+2. **`claude`** (part of `default`/`all`): regenerates the Claude Code agent
+   mirrors (`node scripts/sync-agents.mjs --profile <p>`) — the `--profile`
+   flag is accepted for CLI compatibility but no longer changes mirror
+   content; see "Claude Code mirrors" below — **backs up** any existing
+   `~/.claude/agents/` the same way, then symlinks each skill directory into
+   `~/.claude/skills/`, one at a time; an existing real (non-symlink) skill
+   directory of the same name is skipped with a warning, never overwritten.
+3. **`codex`** (part of `all` only): see [Codex](#codex) below.
+4. **`antigravity`**/`gemini` (part of `all` only): delegates to
+   `antigravity/install.sh` — see that script's own header for details.
+
+Finally, regardless of which steps were selected, the installer re-runs
+`node scripts/validate.mjs` and `bash scripts/doctor.sh` once as a
+post-install verification pass, so you see immediately whether anything is
+still missing.
 
 Everything is symlinked, not copied, so the repo stays the single source of
 truth and `git pull` updates your live setup. The script is safe to re-run.
@@ -203,13 +223,15 @@ To regenerate after editing an `agents/*.md` source or a
 
 ```bash
 ./scripts/install.sh --target codex              # repo files only, personal profile by default
-# --target all runs the default OpenCode + Claude Code path, then this
+# --target opencode,claude,codex (or --target all, which also runs antigravity) composes this with the other harnesses
 node scripts/sync-codex-agents.mjs --profile personal --check   # CI: nonzero exit if any file is stale
 ```
 
-`--target codex`/`all` only ever write inside this repo, under
-`.codex/agents/` — **project-scope only for now**; nothing under `~/.codex`
-is touched, since that directory is user-owned.
+The codex step (selected via `--target codex`, or as part of `--target all`)
+only ever writes inside this repo, under `.codex/agents/` — **project-scope
+only for now**; nothing under `~/.codex` is touched, since that directory is
+user-owned. (Other targets composed alongside it — `opencode`, `claude`,
+`antigravity` — do write under `$HOME`; see their own sections.)
 
 Model, reasoning-effort, and sandbox values are generator input from
 `config/codex.personal.jsonc` (model slugs verified against this machine's
@@ -251,6 +273,11 @@ multi-step, parallelizable, or file-producing task to the roster by
 default, triage each delegation to the cheapest capable model tier,
 escalate ambiguity upward instead of guessing, and reject any "done" report
 that lacks a verification result.
+
+Antigravity also receives every skill under `.claude/skills/*` — via
+`antigravity/install.sh`, which mirrors each one into `~/.gemini/skills/`
+alongside its own `engineering-team` skill — while Codex CLI has no
+applicable skill-discovery mechanism today (see [docs/codex.md](docs/codex.md)).
 
 To make it load automatically instead of needing an explicit
 `/delegate-first` every session, add a one-line trigger for it to your
@@ -301,7 +328,7 @@ is a one-line profile edit.
 │   ├── codex.personal.jsonc     # verified Codex model/effort/sandbox routing
 │   └── codex.work.jsonc         # Codex routing — TODO template, fill on the work account
 ├── scripts/
-│   ├── install.sh               # --target default|codex|all, --profile personal|work, --dry-run
+│   ├── install.sh               # --target <comma-list of opencode|claude|codex|antigravity, or default|all>, --profile personal|work, --dry-run
 │   ├── sync-agents.mjs          # agents/ -> .claude/agents/ (hardcoded per-role model tiers)
 │   ├── sync-codex-agents.mjs    # agents/ -> .codex/agents/*.toml (--profile, --check)
 │   ├── validate.mjs             # contract checks (--platform all|opencode|claude|codex)
@@ -321,10 +348,12 @@ is a one-line profile edit.
     └── codex.md                 # Codex integration: mapping, model tiers, fidelity limits
 ```
 
-**Requirements:** OpenCode on `PATH` for the default/`all` install targets,
-Node ≥ 20 (all scripts are dependency-free — no `npm install`), bash. Codex
-CLI is only needed if you use `--target codex`/`all`, or want to actually
-run the generated `.codex/agents/*.toml` files.
+**Requirements:** OpenCode on `PATH` for the `opencode` install target (part
+of `default`/`all`), Node ≥ 20 (all scripts are dependency-free — no `npm
+install`), bash. Codex CLI is only needed if you use `--target codex` (or
+`all`), or want to actually run the generated `.codex/agents/*.toml` files.
+Similarly, Antigravity/Gemini itself is only needed to actually run the
+mirrored skill/rules files that `--target antigravity` (or `all`) installs.
 
 ## License
 
