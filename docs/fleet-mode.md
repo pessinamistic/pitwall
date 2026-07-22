@@ -29,9 +29,29 @@ All commands go through `scripts/fleet/pit-wall.sh` (`FLEET_ROLES`:
 `tech-lead`, `senior-dev`, `implementer`, `boilerplate`, `code-reviewer`,
 `debugger`):
 
+### Backends
+
+`spawn` supports two backends, selected with `--backend <opencode|antigravity>`
+or the `SCUDERIA_FLEET_BACKEND` env var (default `opencode`, unchanged
+behavior from before this flag existed):
+
+- **`opencode`** (default) — `opencode run --agent <role> "<brief>"`, same as
+  always.
+- **`antigravity`** — `agy --agent oc-<role> --print "<brief>"`, routing the
+  task through your Antigravity/Gemini account instead of paid Claude/OpenCode
+  credits. Targets the `oc-<role>` custom agents that `antigravity/install.sh`
+  installs (see [`antigravity/README.md`](../antigravity/README.md)) — run
+  that installer at least once first, and make sure `agy` is authenticated.
+  `agy` calls are subject to your account's own plan quota; a spawned task can
+  fail with a quota error independent of anything in this repo — check the
+  pane (`pit-wall.sh attach <task-id>`) if a task looks `done` unexpectedly
+  fast.
+
+`SCUDERIA_FLEET_LAUNCH_CMD` (below) overrides both backends unconditionally.
+
 | Command | Does |
 |---|---|
-| `spawn <role> "<brief>"` | Launches `<role>` as its own `opencode` process in a new tmux window; assigns it a task id like `implementer-1`. |
+| `spawn <role> ["--backend opencode\|antigravity"] "<brief>"` | Launches `<role>` as its own process in a new tmux window (`opencode` by default, or `agy` with `--backend antigravity`); assigns it a task id like `implementer-1`. |
 | `view [--watch]` | Prints the pit-wall board once, or with `--watch`, clears and redraws it every `SCUDERIA_FLEET_POLL` seconds. |
 | `supervise [--forever]` | Runs the status-polling loop in the foreground until every task is `done`/`gone`, or forever with `--forever`. |
 | `watch [--forever]` | Backgrounds `supervise` (forwarding `--forever`) and then runs `view --watch` in the foreground — the usual way to drive fleet mode interactively. |
@@ -110,7 +130,9 @@ run any `pit-wall.sh` command:
 | `SCUDERIA_FLEET_SESSION` | `scuderia` | tmux session name used to host task windows when fleet mode isn't invoked from inside tmux already. |
 | `SCUDERIA_FLEET_POLL` | `5` | Supervisor poll interval and `view --watch` redraw interval, in seconds. |
 | `SCUDERIA_FLEET_IDLE` | `45` | Seconds with no pane-output change before a task is marked `idle` (and, if it looks stuck on a prompt, `wedged`). |
-| `SCUDERIA_FLEET_OPENCODE` | `opencode` | The harness binary invoked to launch a role — override to point at a wrapper or a non-`PATH` binary. |
+| `SCUDERIA_FLEET_OPENCODE` | `opencode` | The harness binary invoked to launch a role under the `opencode` backend — override to point at a wrapper or a non-`PATH` binary. |
+| `SCUDERIA_FLEET_AGY` | `agy` | The harness binary invoked to launch a role under the `antigravity` backend. |
+| `SCUDERIA_FLEET_BACKEND` | `opencode` | Default backend for `spawn` when `--backend` isn't given: `opencode` or `antigravity`. |
 | `SCUDERIA_FLEET_CAPTURE_LINES` | `200` | How many lines of pane scrollback are captured per poll, both for the idle/wedged hash and for the board's last-output tail. |
 
 Two more `SCUDERIA_FLEET_*` variables exist for advanced/test use, with no

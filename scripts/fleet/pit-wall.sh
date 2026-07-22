@@ -5,7 +5,8 @@
 # See docs/fleet-mode.md for the model and its trade-offs.
 #
 # Usage:
-#   pit-wall.sh spawn <role> "<brief>"     launch a role in its own window
+#   pit-wall.sh spawn <role> ["--backend opencode|antigravity"] "<brief>"
+#                                           launch a role in its own window
 #   pit-wall.sh view [--watch]             the live board
 #   pit-wall.sh supervise [--forever]      run the watcher loop (foreground)
 #   pit-wall.sh watch [--forever]          supervise in the background, then view --watch
@@ -71,12 +72,29 @@ cmd_spawn() {
   local role="${1:-}"; shift 2>/dev/null || true
   [ -n "$role" ] || fleet_die "spawn: need a role (one of: $FLEET_ROLES)"
   fleet_is_role "$role" || fleet_die "unknown role '$role' (one of: $FLEET_ROLES)"
-  [ "$#" -gt 0 ] || fleet_die "spawn: need a brief, e.g. pit-wall spawn $role \"add the health endpoint\""
+
+  # Pull an optional --backend <value> (or --backend=<value>) out of the
+  # remaining args, wherever it appears; everything else joins the brief.
+  local backend="${SCUDERIA_FLEET_BACKEND:-opencode}"
+  local brief_args=()
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --backend)   backend="${2:-}"; shift 2 ;;
+      --backend=*) backend="${1#--backend=}"; shift ;;
+      *)           brief_args+=("$1"); shift ;;
+    esac
+  done
+  case "$backend" in
+    opencode|antigravity) ;;
+    *) fleet_die "spawn: --backend must be 'opencode' or 'antigravity', got '$backend'" ;;
+  esac
+
+  [ "${#brief_args[@]}" -gt 0 ] || fleet_die "spawn: need a brief, e.g. pit-wall spawn $role \"add the health endpoint\""
   fleet_tmux_available || fleet_die "tmux is not installed — fleet mode needs it (brew install tmux)"
   fleet_init_home
 
   local brief ses id wname wid cwd launch n
-  brief="$*"
+  brief="${brief_args[*]}"
   ses="$(fleet_tmux_session_ensure)"
   n="$(cat "$SCUDERIA_FLEET_HOME/.counter" 2>/dev/null || echo 0)"; n=$(( n + 1 ))
   printf '%s' "$n" > "$SCUDERIA_FLEET_HOME/.counter"
@@ -87,7 +105,7 @@ cmd_spawn() {
   if [ -n "${SCUDERIA_FLEET_LAUNCH_CMD:-}" ]; then
     launch="$SCUDERIA_FLEET_LAUNCH_CMD"            # test / advanced override
   else
-    launch="$SCUDERIA_FLEET_OPENCODE run --agent $role ${SCUDERIA_FLEET_RUN_ARGS:-} $(fleet_shq "$brief")"
+    launch="$(fleet_build_launch_cmd "$role" "$backend" "$brief")"
   fi
 
   wid="$(fleet_tmux_create_window "$ses" "$wname" "$cwd" "$launch")" \
@@ -95,6 +113,7 @@ cmd_spawn() {
 
   printf '%s' "$brief" > "$(fleet_brief_file "$id")"
   fleet_set "$id" role "$role"
+  fleet_set "$id" backend "$backend"
   fleet_set "$id" window "$wid"
   fleet_set "$id" session "$ses"
   fleet_set "$id" cwd "$cwd"
@@ -105,7 +124,7 @@ cmd_spawn() {
   fleet_set "$id" hash ""
   fleet_log "spawn $id role=$role window=$wid cwd=$cwd"
 
-  printf 'pit-wall: spawned %s  (role=%s, window=%s)\n' "$id" "$role" "$wid"
+  printf 'pit-wall: spawned %s  (role=%s, backend=%s, window=%s)\n' "$id" "$role" "$backend" "$wid"
   printf '  view:   %s view --watch\n' "$0"
   printf '  attach: %s attach %s\n' "$0" "$id"
 }

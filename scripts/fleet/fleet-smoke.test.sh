@@ -94,6 +94,22 @@ check "window killed" "$(fleet_supervise_task van)" gone
 echo ""
 echo "  alarm logged? $(grep -c ALARM "$FLEET_LOG" 2>/dev/null || echo 0) line(s)"
 
+# --- backend selection: pure launch-command construction, no tmux needed ---
+SCUDERIA_FLEET_OPENCODE="opencode"
+SCUDERIA_FLEET_AGY="agy"
+unset SCUDERIA_FLEET_RUN_ARGS
+
+check "opencode backend (default)" \
+  "$(fleet_build_launch_cmd implementer opencode 'add the healthz endpoint')" \
+  "opencode run --agent implementer  'add the healthz endpoint'"
+
+check "antigravity backend" \
+  "$(fleet_build_launch_cmd implementer antigravity 'add the healthz endpoint')" \
+  "agy --agent oc-implementer --print 'add the healthz endpoint'"
+
+fleet_build_launch_cmd implementer bogus-backend 'x' >/dev/null 2>&1
+check "invalid backend fails" "$?" "1"
+
 echo ""
 echo "  RESULT: $pass passed, $fail failed"
 
