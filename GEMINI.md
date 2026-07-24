@@ -7,7 +7,14 @@ execute the work hierarchically.
 ## Available Engineering Agents
 
 These agents are registered as Antigravity subagents with the `oc-` prefix.
-Define them with `define_subagent` before first use in a conversation.
+Each is a real, pre-registered custom agent — a dedicated
+`agents/oc-<role>/agent.md` file (workspace-scoped copy in this repo at
+`.agents/agents/`, plus a global copy symlinked to
+`~/.gemini/config/agents/` by `antigravity/install.sh`) that Antigravity
+discovers on its own. There is no `define_subagent` step — select one
+directly from the `/agents` picker, or invoke one by name if the current
+session supports that. See `antigravity/README.md` for how the files get
+there.
 
 ### Delegation Hierarchy
 

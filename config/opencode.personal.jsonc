@@ -18,7 +18,23 @@
     "debugger":      { "model": "ollama/deepseek-r1:7b" },            // reasoning — remote Ollama host — see your provider config
 
     // Built-in — keep cheap so it doesn't compete with tech-lead.
-    "plan": { "model": "ollama-local/qwen2.5-coder:7b" }
+    "plan": { "model": "ollama-local/qwen2.5-coder:7b" },
+
+    // Fleet mode's opencode backend (scripts/fleet/lib/common.sh) launches
+    // `opencode run --agent fleet-<role>`, a distinct agent identifier from
+    // the bare role name above (see docs/fleet-mode.md and
+    // scripts/sync-fleet-agents.mjs) — OpenCode's agent.<name>.model config
+    // is keyed by the exact invoked identifier, confirmed empirically to
+    // NOT fall back to a same-named entry under a different key, so each
+    // fleet-<role> needs its own entry here. Every value below is a
+    // deliberate 1:1 mirror of its non-fleet counterpart above — keep them
+    // in sync if you change one.
+    "fleet-tech-lead":     { "model": "opencode/big-pickle" },
+    "fleet-senior-dev":    { "model": "ollama/qwen3.5:27b" },
+    "fleet-implementer":   { "model": "ollama-local/qwen2.5-coder:7b" },
+    "fleet-boilerplate":   { "model": "ollama-local/gemma2:2b" },
+    "fleet-code-reviewer": { "model": "ollama/deepseek-r1:7b" },
+    "fleet-debugger":      { "model": "ollama/deepseek-r1:7b" }
   }
 
   // senior-dev, code-reviewer, and debugger all route to the remote Ollama

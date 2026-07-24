@@ -29,6 +29,21 @@
     "debugger":      { "model": "github-copilot/gpt-5.6-terra" }, // reasoning-tuned
 
     // Built-in — keep cheap so it doesn't compete with tech-lead.
-    "plan": { "model": "github-copilot/claude-haiku-4.5" } // cheapest available
+    "plan": { "model": "github-copilot/claude-haiku-4.5" }, // cheapest available
+
+    // Fleet mode's opencode backend launches `opencode run --agent
+    // fleet-<role>`, a distinct agent identifier from the bare role name
+    // above (see docs/fleet-mode.md and scripts/sync-fleet-agents.mjs) —
+    // OpenCode's agent.<name>.model config is keyed by the exact invoked
+    // identifier, confirmed empirically to NOT fall back to a same-named
+    // entry under a different key, so each fleet-<role> needs its own
+    // entry here. Every value below is a deliberate 1:1 mirror of its
+    // non-fleet counterpart above — keep them in sync if you change one.
+    "fleet-tech-lead":     { "model": "github-copilot/claude-sonnet-5" },
+    "fleet-senior-dev":    { "model": "github-copilot/claude-sonnet-4.6" },
+    "fleet-implementer":   { "model": "github-copilot/claude-sonnet-4.5" },
+    "fleet-boilerplate":   { "model": "github-copilot/claude-haiku-4.5" },
+    "fleet-code-reviewer": { "model": "github-copilot/gpt-5.6-terra" },
+    "fleet-debugger":      { "model": "github-copilot/gpt-5.6-terra" }
   }
 }
