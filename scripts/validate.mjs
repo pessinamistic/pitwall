@@ -358,6 +358,26 @@ function validateConfigProfile(fileName, { isPersonal }) {
     checkAgentModelEntry(fleetAgentName(agentName));
   }
 
+  // The fleet-<role> entries exist solely so fleet mode's opencode backend
+  // has a real primary-mode agent to launch, and both config files document
+  // them as a deliberate 1:1 mirror of their non-fleet counterpart (see
+  // docs/fleet-mode.md). Enforce that they're actually kept in sync -- but
+  // only when both sides were resolved above; a missing entry already
+  // produced its own error() and comparing against undefined here would
+  // just be noise.
+  for (const agentName of TEAM_ROLES) {
+    const fleetName = fleetAgentName(agentName);
+    const a = modelsByAgent[agentName];
+    const b = modelsByAgent[fleetName];
+    if (a !== undefined && b !== undefined && a !== b) {
+      error(
+        `config/${fileName}: agent.${agentName}.model ("${a}") and agent.${fleetName}.model ` +
+          `("${b}") differ — fleet mode's opencode backend expects these to stay a 1:1 mirror ` +
+          `(see docs/fleet-mode.md); update whichever one is stale.`
+      );
+    }
+  }
+
   if (!obj.agent.plan || typeof obj.agent.plan.model !== 'string' || obj.agent.plan.model === '') {
     warn(
       `config/${fileName}: agent.plan.model is not set. The built-in "plan" agent will ` +
