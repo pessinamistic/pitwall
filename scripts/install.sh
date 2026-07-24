@@ -274,6 +274,40 @@ install_agent_dir() {
 }
 
 # ---------------------------------------------------------------------
+# install_skills <skills_dir> -- symlink every directory under
+# .claude/skills/ into <skills_dir>, one at a time, so an existing
+# non-symlink skill directory (e.g. the user's own `graphify`) is never
+# overwritten. Shared by the opencode and claude steps. OpenCode discovers
+# skills from both ~/.config/opencode/skills and ~/.claude/skills and
+# dedupes by name, so installing into both when both harnesses are selected
+# is safe -- no skill is double-listed.
+# ---------------------------------------------------------------------
+
+install_skills() {
+  local skills_dir="$1"
+  act "ensure $skills_dir exists" mkdir -p "$skills_dir"
+
+  local skill_src skill_name skill_target
+  for skill_src in "$REPO_ROOT/.claude/skills"/*/; do
+    skill_name="$(basename "$skill_src")"
+    skill_target="$skills_dir/$skill_name"
+    # Strip trailing slash source path for a clean symlink target.
+    skill_src="${skill_src%/}"
+
+    if [ -L "$skill_target" ]; then
+      # $1/$2 must expand inside the bash -c subshell, not the parent shell.
+      # shellcheck disable=SC2016
+      act "refresh existing symlink $skill_target -> $skill_src" bash -c \
+        'rm "$1" && ln -s "$2" "$1"' _ "$skill_target" "$skill_src"
+    elif [ -e "$skill_target" ]; then
+      log "WARNING: $skill_target already exists and is not a symlink — skipping (not overwriting a real directory like a hand-authored skill)."
+    else
+      act "symlink $skill_target -> $skill_src" ln -s "$skill_src" "$skill_target"
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------
 # opencode step: regenerate the fleet-primary agent variants (so what gets
 # symlinked below is always current -- same "regenerate before validating"
 # pattern the claude/codex steps use for their own generators), the shared
@@ -357,6 +391,11 @@ install_opencode() {
     act "copy $profile_config -> $oc_config (no existing config to merge into)" \
       cp "$profile_config" "$oc_config"
   fi
+
+  # Symlink skills into ~/.config/opencode/skills/ so an opencode-only
+  # install still provisions them. OpenCode also reads ~/.claude/skills and
+  # dedupes by name, so this overlaps harmlessly when claude is selected too.
+  install_skills "$HOME/.config/opencode/skills"
 }
 
 # ---------------------------------------------------------------------
@@ -378,30 +417,8 @@ install_claude() {
   # shellcheck disable=SC2088
   install_agent_dir "$HOME/.claude/agents" "$REPO_ROOT/.claude/agents" "~/.claude/agents"
 
-  # Symlink skills into ~/.claude/skills/, one directory at a time, so an
-  # existing non-symlink skill directory (e.g. the user's own `graphify`)
-  # is never touched.
-  local claude_skills_dir="$HOME/.claude/skills"
-  act "ensure $claude_skills_dir exists" mkdir -p "$claude_skills_dir"
-
-  local skill_src skill_name skill_target
-  for skill_src in "$REPO_ROOT/.claude/skills"/*/; do
-    skill_name="$(basename "$skill_src")"
-    skill_target="$claude_skills_dir/$skill_name"
-    # Strip trailing slash source path for a clean symlink target.
-    skill_src="${skill_src%/}"
-
-    if [ -L "$skill_target" ]; then
-      # $1/$2 must expand inside the bash -c subshell, not the parent shell.
-      # shellcheck disable=SC2016
-      act "refresh existing symlink $skill_target -> $skill_src" bash -c \
-        'rm "$1" && ln -s "$2" "$1"' _ "$skill_target" "$skill_src"
-    elif [ -e "$skill_target" ]; then
-      log "WARNING: $skill_target already exists and is not a symlink — skipping (not overwriting a real directory like a hand-authored skill)."
-    else
-      act "symlink $skill_target -> $skill_src" ln -s "$skill_src" "$skill_target"
-    fi
-  done
+  # Symlink skills into ~/.claude/skills/ (Claude Code's skill search path).
+  install_skills "$HOME/.claude/skills"
 }
 
 # ---------------------------------------------------------------------
