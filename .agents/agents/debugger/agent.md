@@ -1,5 +1,5 @@
 ---
-name: oc-debugger
+name: debugger
 description: "Investigates failing tests, stack traces, and behavior that diverges from expectation — reproduces the fault, isolates it, and reports root cause plus a minimal fix. Use when something is broken and the cause is not obvious. Not for implementing features or for known-cause work where you already know what to change."
 model: pro
 ---

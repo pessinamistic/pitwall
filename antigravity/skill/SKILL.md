@@ -12,9 +12,13 @@ description: >-
 # Engineering Team — Antigravity Integration
 
 This skill ports the OpenCode multi-agent engineering team into Antigravity's
-native subagent system. The agents are defined as Antigravity subagents via
-`define_subagent` / `invoke_subagent`, with model routing mapped to
-Antigravity's tier system.
+native custom-agent system. The agents are real, persistent custom `agent.md`
+files that Antigravity discovers on its own — workspace-scoped in this repo
+under `.agents/agents/<role>/`, plus global copies under
+`~/.gemini/config/agents/` installed by `antigravity/install.sh`. There is no
+`define_subagent` / `invoke_subagent` step. Model routing is mapped to
+Antigravity's tier system. See `antigravity/README.md` for the full
+registration mechanism.
 
 ## Agent Hierarchy
 
@@ -86,15 +90,22 @@ debugger → (root cause found) → tech-lead routes fix to implementer/senior-d
 
 ## Usage
 
-The agents are registered as Antigravity subagents. Use them via:
+These are six separate Antigravity custom agents (`tech-lead`, `senior-dev`,
+`implementer`, `boilerplate`, `code-reviewer`, `debugger`). A human opens the
+`/agents` panel and selects one at a time — there is no in-session sub-agent
+invocation, and an agent cannot call a sibling agent from within its own
+session.
+
+To run a role standalone/non-interactively (for example, to fire off parallel
+independent tasks), use fleet mode from a terminal:
 
 ```
-invoke_subagent with TypeName: "oc-tech-lead"
-invoke_subagent with TypeName: "oc-senior-dev"
-invoke_subagent with TypeName: "oc-implementer"
-invoke_subagent with TypeName: "oc-boilerplate"
-invoke_subagent with TypeName: "oc-code-reviewer"
-invoke_subagent with TypeName: "oc-debugger"
+scripts/fleet/pit-wall.sh spawn <role> --backend antigravity "<brief>"
 ```
 
-The `oc-` prefix distinguishes them from Antigravity's built-in subagents.
+See `docs/fleet-mode.md` for details.
+
+When an interactively-running agent (e.g. `tech-lead`) needs to delegate, it
+produces the task brief and hands it to the human — to either paste into the
+target agent via the `/agents` panel or launch via fleet mode. It must NOT
+attempt an in-session invocation or guess agent-name strings.

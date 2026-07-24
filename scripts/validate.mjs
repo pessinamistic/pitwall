@@ -743,14 +743,14 @@ function validateCodex() {
 }
 
 // ---------------------------------------------------------------------
-// Antigravity: the generated .agents/agents/oc-<role>/agent.md files.
+// Antigravity: the generated .agents/agents/<role>/agent.md files.
 // Same staleness-by-rebuild pattern as the Codex TOML check above: rebuild
 // each file in-memory via the generator's own exported buildAgentMd() +
 // ANTIGRAVITY_MODEL_BY_AGENT and compare byte-for-byte, so a hand-edited or
 // stale committed file both fail. Also asserts the ANTIGRAVITY_MODEL_BY_AGENT
 // tier map covers exactly the six roles with a confirmed tier value (same
 // guard pattern as validateClaudeTierMap above), and that each committed
-// file lives in its own dedicated oc-<role>/ subdirectory (the discovery
+// file lives in its own dedicated <role>/ subdirectory (the discovery
 // gotcha documented in antigravity/README.md).
 // ---------------------------------------------------------------------
 
@@ -784,10 +784,10 @@ function validateAntigravityTierMap() {
 function validateAntigravityGeneratedFiles() {
   const outBaseDir = path.join(REPO_ROOT, '.agents', 'agents');
   for (const role of TEAM_ROLES) {
-    const agentPath = path.join(outBaseDir, `oc-${role}`, 'agent.md');
+    const agentPath = path.join(outBaseDir, role, 'agent.md');
     if (!fs.existsSync(agentPath)) {
       error(
-        `.agents/agents/oc-${role}/agent.md is missing — run ` +
+        `.agents/agents/${role}/agent.md is missing — run ` +
           `\`node scripts/sync-antigravity-agents.mjs --profile personal\`.`
       );
       continue;
@@ -797,23 +797,23 @@ function validateAntigravityGeneratedFiles() {
     try {
       parsed = parseFrontmatterFile(existing);
     } catch (e) {
-      error(`.agents/agents/oc-${role}/agent.md: failed to parse frontmatter — ${e.message}`);
+      error(`.agents/agents/${role}/agent.md: failed to parse frontmatter — ${e.message}`);
       continue;
     }
     if (!parsed) {
-      error(`.agents/agents/oc-${role}/agent.md: no frontmatter block found (must start with "---" at byte 0).`);
+      error(`.agents/agents/${role}/agent.md: no frontmatter block found (must start with "---" at byte 0).`);
       continue;
     }
     const fm = parsed.frontmatter;
-    if (fm.name !== `oc-${role}`) {
-      error(`.agents/agents/oc-${role}/agent.md: frontmatter name "${fm.name}" does not match "oc-${role}".`);
+    if (fm.name !== role) {
+      error(`.agents/agents/${role}/agent.md: frontmatter name "${fm.name}" does not match "${role}".`);
     }
     if (typeof fm.description !== 'string' || !fm.description) {
-      error(`.agents/agents/oc-${role}/agent.md: frontmatter is missing a non-empty "description".`);
+      error(`.agents/agents/${role}/agent.md: frontmatter is missing a non-empty "description".`);
     }
     if ('model' in fm && !ANTIGRAVITY_MODEL_TIERS.includes(fm.model)) {
       error(
-        `.agents/agents/oc-${role}/agent.md: frontmatter "model: ${fm.model}" is not one of the ` +
+        `.agents/agents/${role}/agent.md: frontmatter "model: ${fm.model}" is not one of the ` +
           `confirmed Antigravity values (${ANTIGRAVITY_MODEL_TIERS.join('|')}).`
       );
     }
@@ -822,19 +822,19 @@ function validateAntigravityGeneratedFiles() {
     if (!fs.existsSync(srcPath)) continue; // missing source reported elsewhere
     const srcParsed = parseFrontmatterFile(fs.readFileSync(srcPath, 'utf8'));
     if (fm.description !== srcParsed.frontmatter.description) {
-      error(`.agents/agents/oc-${role}/agent.md: description does not match agents/${role}.md's source description.`);
+      error(`.agents/agents/${role}/agent.md: description does not match agents/${role}.md's source description.`);
     }
 
     let expected;
     try {
       expected = buildAgentMd(role, srcParsed.frontmatter, srcParsed.body, ANTIGRAVITY_MODEL_BY_AGENT[role]);
     } catch (e) {
-      error(`.agents/agents/oc-${role}/agent.md: could not rebuild for comparison — ${e.message}`);
+      error(`.agents/agents/${role}/agent.md: could not rebuild for comparison — ${e.message}`);
       continue;
     }
     if (existing !== expected) {
       error(
-        `.agents/agents/oc-${role}/agent.md is stale or hand-edited — regenerate with ` +
+        `.agents/agents/${role}/agent.md is stale or hand-edited — regenerate with ` +
           `\`node scripts/sync-antigravity-agents.mjs --profile personal\`.`
       );
     }

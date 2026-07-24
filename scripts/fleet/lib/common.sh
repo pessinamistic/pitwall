@@ -112,12 +112,12 @@ fleet_build_launch_cmd() {
         "$SCUDERIA_FLEET_OPENCODE" "$role" "${SCUDERIA_FLEET_RUN_ARGS:-}" "$(fleet_shq "$brief")"
       ;;
     antigravity)
-      # Targets the oc-<role> custom agent installed by antigravity/install.sh
-      # (see antigravity/README.md) -- not the bare role name, which agy
-      # doesn't know about. --print runs one prompt non-interactively and
+      # Targets the <role> custom agent installed by antigravity/install.sh
+      # (see antigravity/README.md) -- the bare role name, unlike the
+      # opencode backend above. --print runs one prompt non-interactively and
       # exits; the prompt is a plain trailing argument (confirmed empirically
       # against a live agy binary -- no special quoting or stdin needed).
-      printf '%s --agent oc-%s --print %s' \
+      printf '%s --agent %s --print %s' \
         "$SCUDERIA_FLEET_AGY" "$role" "$(fleet_shq "$brief")"
       ;;
     *)

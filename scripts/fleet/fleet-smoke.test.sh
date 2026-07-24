@@ -105,7 +105,7 @@ check "opencode backend (default)" \
 
 check "antigravity backend" \
   "$(fleet_build_launch_cmd implementer antigravity 'add the healthz endpoint')" \
-  "agy --agent oc-implementer --print 'add the healthz endpoint'"
+  "agy --agent implementer --print 'add the healthz endpoint'"
 
 fleet_build_launch_cmd implementer bogus-backend 'x' >/dev/null 2>&1
 check "invalid backend fails" "$?" "1"

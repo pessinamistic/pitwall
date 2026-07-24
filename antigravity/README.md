@@ -25,7 +25,7 @@ generated files or anything under `~/.gemini/`.
 
 | File | Installed to | Purpose |
 |------|-------------|---------|
-| `.agents/agents/oc-<role>/agent.md` (generated — see below) | `~/.gemini/config/agents/oc-<role>/agent.md` | The six native Antigravity custom agents, globally available across projects |
+| `.agents/agents/<role>/agent.md` (generated — see below) | `~/.gemini/config/agents/<role>/agent.md` | The six native Antigravity custom agents, globally available across projects |
 | `antigravity/skill/SKILL.md` | `~/.gemini/skills/engineering-team/SKILL.md` | Antigravity skill definition — documentation, hierarchy, model routing reference |
 | `antigravity/rules/engineering-team.md` | `~/.gemini/rules/engineering-team.md` | Delegation-hierarchy and escalation-policy guidance for whichever agent is driving |
 | every `.claude/skills/<name>/` directory | `~/.gemini/skills/<name>/` | Generalized mirror — every shared skill (`delegate-first`, `java`, `kafka`, ...) is symlinked in, so a skill added under `.claude/skills/` reaches Antigravity with no separate install step |
@@ -40,7 +40,7 @@ so it never needs updating when a new skill is added there — see
 The six agents are real, persistent `agent.md` files — not something
 registered at conversation start. `scripts/sync-antigravity-agents.mjs`
 generates them from `agents/*.md` (the same single source the Claude Code
-and Codex mirrors use) into `.agents/agents/oc-<role>/agent.md`. These
+and Codex mirrors use) into `.agents/agents/<role>/agent.md`. These
 generated files are committed to the repo.
 
 Antigravity discovers agents from two locations (confirmed against
@@ -53,11 +53,11 @@ Antigravity's own docs — see "Sources" below):
   whenever you're working inside this repo.
 - **Global-scoped**: `~/.gemini/config/agents/<name>/agent.md`, available
   from any project. `antigravity/install.sh` symlinks each
-  `.agents/agents/oc-<role>/` directory to
-  `~/.gemini/config/agents/oc-<role>/` for this.
+  `.agents/agents/<role>/` directory to
+  `~/.gemini/config/agents/<role>/` for this.
 
 **Discovery gotcha**: an agent MUST live in its own dedicated subdirectory
-— `agents/oc-tech-lead/agent.md`, never `agents/oc-tech-lead.md` directly
+— `agents/tech-lead/agent.md`, never `agents/tech-lead.md` directly
 under the agents root. Antigravity's docs call this out explicitly: placing
 files directly in the parent folder causes discovery failures. Both the
 generator and `antigravity/install.sh` are written to respect this.
@@ -66,7 +66,7 @@ generator and `antigravity/install.sh` are written to respect this.
 
 ```yaml
 ---
-name: oc-tech-lead
+name: tech-lead
 description: "..."
 model: pro
 ---
@@ -83,9 +83,9 @@ old, dynamic `define_subagent` tool-call mechanism, which this integration
 no longer uses). Where the OpenCode source restricts direct edits, that
 intent is instead expressed as a short prose note appended to the agent
 body by the generator — worded to match the actual restriction, not
-overstate it: `oc-code-reviewer` (`permission.edit: deny` — absolute, no
+overstate it: `code-reviewer` (`permission.edit: deny` — absolute, no
 write tools) gets "this agent profile has no write tools enabled — you
-report findings; you never edit files," while `oc-tech-lead`
+report findings; you never edit files," while `tech-lead`
 (`permission.edit: ask` — an escape hatch requiring confirmation, not a
 hard block) gets a note that it still orchestrates and delegates but may
 edit directly as a last resort.
@@ -94,17 +94,24 @@ edit directly as a last resort.
 
 | OpenCode Agent | Antigravity Agent | Model Tier |
 |---------------|---------------------|-----------|
-| tech-lead | `oc-tech-lead` | `pro` |
-| senior-dev | `oc-senior-dev` | `pro` |
-| implementer | `oc-implementer` | `inherit` |
-| boilerplate | `oc-boilerplate` | `flash` |
-| code-reviewer | `oc-code-reviewer` | `pro` |
-| debugger | `oc-debugger` | `pro` |
+| tech-lead | `tech-lead` | `pro` |
+| senior-dev | `senior-dev` | `pro` |
+| implementer | `implementer` | `inherit` |
+| boilerplate | `boilerplate` | `flash` |
+| code-reviewer | `code-reviewer` | `pro` |
+| debugger | `debugger` | `pro` |
 
 ### Key Design Decisions
 
-1. **`oc-` prefix**: Avoids collisions with Antigravity's built-in `research`
-   and `self` subagents.
+1. **No name prefix**: The six roles are exposed to Antigravity under their
+   plain names (`tech-lead`, `senior-dev`, `implementer`, `boilerplate`,
+   `code-reviewer`, `debugger`). Antigravity's built-in subagents are
+   `research`, `browser`, and `self` (see "Sources") — none of the six names
+   collide with them, and Antigravity places no reserved-name or prefix
+   requirement on custom agents. An earlier revision prefixed every name with
+   a leading "oc-" marker to dodge a collision that does not actually exist;
+   that prefix was dropped because it caused confusion when
+   selecting/invoking agents by name.
 
 2. **Model routing via Antigravity tiers**: OpenCode's model routing
    (`opencode.jsonc → agent.*.model`) maps to Antigravity's confirmed model
@@ -116,25 +123,32 @@ edit directly as a last resort.
 
 3. **Permission intent via prose, not frontmatter**: see "Confirmed
    frontmatter schema" above — there is no structural permission field to
-   set, so `oc-tech-lead` and `oc-code-reviewer` get a short appended note
+   set, so `tech-lead` and `code-reviewer` get a short appended note
    instead.
 
 ## How Agents Are Used at Runtime
 
 Open the Antigravity app's `/agents` panel (or "Create New Agents" dialog)
-and select `oc-tech-lead`, `oc-senior-dev`, etc. directly — there is no
+and select `tech-lead`, `senior-dev`, etc. directly — there is no
 `define_subagent` step. From there, the selected agent's own system prompt
 (the body of its `agent.md`, ported from `agents/*.md`) drives delegation:
-`oc-tech-lead` reads the codebase, decomposes the work, and hands focused
-briefs to the workers; workers report back; `oc-tech-lead` gates on review
+`tech-lead` reads the codebase, decomposes the work, and hands focused
+briefs to the workers; workers report back; `tech-lead` gates on review
 before reporting to the user. See `antigravity/rules/engineering-team.md`
 for the delegation hierarchy and escalation ladder, which applies
 regardless of which agent is currently driving.
 
+There is no in-session agent-to-agent invocation at all: an agent cannot
+call a sibling from inside its own session, so `tech-lead` delegates by
+producing a task brief and handing it to the human to paste into the target
+agent via the `/agents` panel. The only standalone/non-interactive path is
+fleet mode from a terminal — `scripts/fleet/pit-wall.sh spawn <role>
+--backend antigravity "<brief>"` (see `docs/fleet-mode.md`).
+
 **Acceptance check**: `validate.mjs --platform antigravity` can only verify
 file structure (frontmatter shape, staleness) — it cannot confirm live
 discovery. After installing, open the Antigravity app and confirm the six
-`oc-*` agents actually appear in its `/agents` panel; that is the real test.
+agents actually appear in its `/agents` panel; that is the real test.
 Separately, the `agy` CLI's `agent` subcommand (`agy agent`) is a
 best-effort secondary check — it has previously shown an unresolved
 discovery anomaly in ad hoc testing (printing no agents from a
