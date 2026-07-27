@@ -36,6 +36,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 
 const PLATFORMS = ['all', 'opencode', 'claude', 'codex', 'antigravity'];
 let PLATFORM = 'all';
+let PROFILE = 'all';
 {
   const argv = process.argv.slice(2);
   for (let i = 0; i < argv.length; i++) {
@@ -44,6 +45,11 @@ let PLATFORM = 'all';
       i++;
     } else if (argv[i].startsWith('--platform=')) {
       PLATFORM = argv[i].slice('--platform='.length);
+    } else if (argv[i] === '--profile') {
+      PROFILE = argv[i + 1];
+      i++;
+    } else if (argv[i].startsWith('--profile=')) {
+      PROFILE = argv[i].slice('--profile='.length);
     } else {
       console.error(`validate.mjs: unknown argument "${argv[i]}".`);
       process.exit(1);
@@ -51,6 +57,10 @@ let PLATFORM = 'all';
   }
   if (!PLATFORMS.includes(PLATFORM)) {
     console.error(`validate.mjs: --platform must be one of ${PLATFORMS.join('|')}, got "${PLATFORM}".`);
+    process.exit(1);
+  }
+  if (PROFILE !== 'all' && PROFILE !== 'personal' && PROFILE !== 'work') {
+    console.error(`validate.mjs: --profile must be personal, work, or all, got "${PROFILE}".`);
     process.exit(1);
   }
 }
@@ -395,8 +405,14 @@ function validateConfigProfile(fileName, { isPersonal }) {
 }
 
 function validateConfigs() {
-  const personal = validateConfigProfile('opencode.personal.jsonc', { isPersonal: true });
-  validateConfigProfile('opencode.work.jsonc', { isPersonal: false });
+  let personal = null;
+  let work = null;
+  if (PROFILE === 'all' || PROFILE === 'personal') {
+    personal = validateConfigProfile('opencode.personal.jsonc', { isPersonal: true });
+  }
+  if (PROFILE === 'all' || PROFILE === 'work') {
+    work = validateConfigProfile('opencode.work.jsonc', { isPersonal: false });
+  }
 
   if (personal) {
     const modelsResult = loadOpencodeModels();
@@ -665,16 +681,17 @@ function validateCodexModelSlugs(agents) {
 
 function validateCodexGeneratedFiles() {
   const outDir = path.join(REPO_ROOT, '.codex', 'agents');
+  const profileToUse = (PROFILE !== 'all') ? PROFILE : 'personal';
   let profileAgents;
   try {
-    profileAgents = loadCodexProfile('personal');
+    profileAgents = loadCodexProfile(profileToUse);
   } catch {
     return; // already reported by validateCodexProfile
   }
   for (const role of TEAM_ROLES) {
     const tomlPath = path.join(outDir, `${role}.toml`);
     if (!fs.existsSync(tomlPath)) {
-      error(`.codex/agents/${role}.toml is missing — run \`node scripts/sync-codex-agents.mjs --profile personal\`.`);
+      error(`.codex/agents/${role}.toml is missing — run \`node scripts/sync-codex-agents.mjs --profile ${profileToUse}\`.`);
       continue;
     }
     const existing = fs.readFileSync(tomlPath, 'utf8');
@@ -689,7 +706,7 @@ function validateCodexGeneratedFiles() {
       continue;
     }
     if (existing !== expected) {
-      error(`.codex/agents/${role}.toml is stale or hand-edited — regenerate with \`node scripts/sync-codex-agents.mjs --profile personal\`.`);
+      error(`.codex/agents/${role}.toml is stale or hand-edited — regenerate with \`node scripts/sync-codex-agents.mjs --profile ${profileToUse}\`.`);
       continue;
     }
     // Structural sanity on what we emitted (belt and braces; limited to the
@@ -735,8 +752,14 @@ function validateAgentsMd() {
 }
 
 function validateCodex() {
-  const personal = validateCodexProfile('codex.personal.jsonc', { isPersonal: true });
-  validateCodexProfile('codex.work.jsonc', { isPersonal: false });
+  let personal = null;
+  let work = null;
+  if (PROFILE === 'all' || PROFILE === 'personal') {
+    personal = validateCodexProfile('codex.personal.jsonc', { isPersonal: true });
+  }
+  if (PROFILE === 'all' || PROFILE === 'work') {
+    work = validateCodexProfile('codex.work.jsonc', { isPersonal: false });
+  }
   if (personal) validateCodexModelSlugs(personal);
   validateCodexGeneratedFiles();
   validateAgentsMd();
