@@ -92,4 +92,15 @@ if [ -d "$REPO_SKILLS_DIR" ]; then
   done
 fi
 
+# ---------------------------------------------------------------------
+# 6. tmux — only relevant if the user opted into fleet mode. If the pit-wall
+#    CLI is installed (its symlink exists) but tmux is gone, fleet mode is
+#    broken and worth flagging. Not checked otherwise: fleet mode is optional
+#    and most installs never touch it.
+# ---------------------------------------------------------------------
+
+if [ -L "$HOME/.local/bin/pit-wall" ] && ! command -v tmux >/dev/null 2>&1; then
+  echo "MISSING: tmux (needed for fleet mode; install: brew install tmux)"
+fi
+
 exit 0

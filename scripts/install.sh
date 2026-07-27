@@ -9,9 +9,10 @@
 #   scripts/install.sh [--target <comma-list>] [--profile personal|work] [--dry-run]
 #
 # --target is a comma-separated list of harnesses, any subset of:
-#   opencode      symlink agents/ -> ~/.config/opencode/agents, merge
-#                 config/opencode.<profile>.jsonc into ~/.config/opencode/opencode.jsonc,
-#                 and symlink .claude/skills/* -> ~/.config/opencode/skills
+#   opencode      symlink agents/ (plus the generated fleet-primary variants
+#                 in agents/fleet/, regenerated first -- see docs/fleet-mode.md)
+#                 -> ~/.config/opencode/agents and merge
+#                 config/opencode.<profile>.jsonc into ~/.config/opencode/opencode.jsonc
 #   claude        regenerate the Claude Code agent mirror, symlink
 #                 .claude/agents -> ~/.claude/agents and .claude/skills/* -> ~/.claude/skills
 #   codex         generate .codex/agents/*.toml in the REPO only --
@@ -45,6 +46,8 @@ PROFILE=""
 DRY_RUN=0
 TARGET=""
 TARGET_EXPLICIT=0
+FLEET=0
+FLEET_EXPLICIT=0
 
 usage() {
   cat <<'USAGE'
@@ -66,12 +69,19 @@ Usage: install.sh [--target <comma-list>] [--profile personal|work] [--dry-run]
                               machine.
   --profile personal|work     Force a routing profile instead of auto-detecting.
   --dry-run                   Print every action that would be taken; do nothing.
+  --fleet                     Also set up optional fleet mode (tmux
+                              orchestration): symlink the pit-wall CLI into
+                              ~/.local/bin. Needs tmux; warns and skips if
+                              tmux is absent. Off by default. See
+                              docs/fleet-mode.md.
+  --no-fleet                  Never prompt for or set up fleet mode.
   -h, --help                  Show this help.
 
 Targets, in the fixed run order:
-  opencode      symlink agents/ -> ~/.config/opencode/agents, merge
-                config/opencode.<profile>.jsonc into ~/.config/opencode/opencode.jsonc,
-                and symlink .claude/skills/* -> ~/.config/opencode/skills
+  opencode      symlink agents/ (plus the generated fleet-primary variants
+                in agents/fleet/, regenerated first -- see docs/fleet-mode.md)
+                -> ~/.config/opencode/agents and merge
+                config/opencode.<profile>.jsonc into ~/.config/opencode/opencode.jsonc
   claude        regenerate the Claude Code agent mirror, symlink
                 .claude/agents -> ~/.claude/agents and .claude/skills/* -> ~/.claude/skills
   codex         generate .codex/agents/*.toml in the REPO only -- never
@@ -102,6 +112,16 @@ while [ $# -gt 0 ]; do
       ;;
     --dry-run)
       DRY_RUN=1
+      shift
+      ;;
+    --fleet)
+      FLEET=1
+      FLEET_EXPLICIT=1
+      shift
+      ;;
+    --no-fleet)
+      FLEET=0
+      FLEET_EXPLICIT=1
       shift
       ;;
     -h|--help)
@@ -288,14 +308,23 @@ install_skills() {
 }
 
 # ---------------------------------------------------------------------
-# opencode step: the shared validate.mjs gate (the full, all-platform
-# contract check -- catches a repo-wide problem before anything is written
-# under $HOME), then the agents symlink, the opencode.jsonc profile merge,
-# and the skills symlink into ~/.config/opencode/skills. Runs only when
+# opencode step: regenerate the fleet-primary agent variants (so what gets
+# symlinked below is always current -- same "regenerate before validating"
+# pattern the claude/codex steps use for their own generators), the shared
+# validate.mjs gate (the full, all-platform contract check -- catches a
+# repo-wide problem before anything is written under $HOME), then the
+# agents symlink and the opencode.jsonc profile merge. Runs only when
 # opencode itself is selected.
 # ---------------------------------------------------------------------
 
 install_opencode() {
+  if [ "$DRY_RUN" = "1" ]; then
+    log "[dry-run] would: node scripts/sync-fleet-agents.mjs --profile $PROFILE"
+  else
+    log "-> node scripts/sync-fleet-agents.mjs --profile $PROFILE"
+    node "$REPO_ROOT/scripts/sync-fleet-agents.mjs" --profile "$PROFILE"
+  fi
+
   if [ "$DRY_RUN" = "1" ]; then
     log "[dry-run] would: node scripts/validate.mjs"
   else
@@ -316,6 +345,28 @@ install_opencode() {
   # Last arg is a decorative label only, not a path operand (the real path is the arg before it).
   # shellcheck disable=SC2088
   install_agent_dir "$HOME/.config/opencode/agents" "$REPO_ROOT/agents" "~/.config/opencode/agents"
+
+  # Additive: fleet-primary agent variants (agents/fleet/*.md, generated
+  # above; see docs/fleet-mode.md and scripts/sync-fleet-agents.mjs),
+  # symlinked into the SAME directory the call just above just (re)created
+  # -- not backed up a second time, since install_agent_dir already moved
+  # anything that was there (including a previous run's fleet-*.md
+  # symlinks) into its own timestamped backup an instant ago, so this
+  # always starts from an empty, freshly-made directory. Needed because
+  # `opencode run --agent <name>` (fleet mode's opencode backend) requires
+  # a primary-mode agent for a top-level invocation, and only tech-lead
+  # among the six source roles is mode: primary -- confirmed empirically
+  # that OpenCode's global agent directory is the reliable discovery path
+  # for fleet mode's actual usage pattern (its tmux window cwd is wherever
+  # `pit-wall.sh spawn` was invoked from, which may be any project, not
+  # necessarily this repo's own checkout).
+  local fleet_src_dir="$REPO_ROOT/agents/fleet"
+  local fleet_target_dir="$HOME/.config/opencode/agents"
+  local fleet_f fleet_base
+  for fleet_f in "$fleet_src_dir"/*.md; do
+    fleet_base="$(basename "$fleet_f")"
+    act "symlink $fleet_target_dir/$fleet_base -> $fleet_f" ln -s "$fleet_f" "$fleet_target_dir/$fleet_base"
+  done
 
   # Merge the chosen profile into ~/.config/opencode/opencode.jsonc,
   # preserving every existing key (provider entries, mcp block, etc.)
@@ -421,6 +472,44 @@ install_antigravity() {
 }
 
 # ---------------------------------------------------------------------
+# fleet step (optional, opt-in): make the pit-wall CLI available for fleet
+# mode (tmux orchestration). Needs tmux; if it is absent we warn and skip
+# rather than fail, because fleet mode is opt-in. Symlinks (never copies,
+# never clobbers a real file) scripts/fleet/pit-wall.sh into ~/.local/bin,
+# mirroring how skills are linked. See docs/fleet-mode.md.
+# ---------------------------------------------------------------------
+
+install_fleet() {
+  if ! command -v tmux >/dev/null 2>&1; then
+    log "fleet: tmux is not installed — fleet mode needs it (e.g. brew install tmux)."
+    log "fleet: skipping fleet setup (re-run with --fleet once tmux is available)."
+    return 0
+  fi
+  local bindir="$HOME/.local/bin" link src
+  link="$bindir/pit-wall"
+  src="$REPO_ROOT/scripts/fleet/pit-wall.sh"
+  act "ensure $bindir exists" mkdir -p "$bindir"
+  if [ -L "$link" ]; then
+    # $1/$2 must expand inside the bash -c subshell, not the parent shell.
+    # shellcheck disable=SC2016
+    act "refresh existing symlink $link -> $src" bash -c \
+      'rm "$1" && ln -s "$2" "$1"' _ "$link" "$src"
+  elif [ -e "$link" ]; then
+    log "fleet: WARNING: $link already exists and is not a symlink — leaving it alone."
+  else
+    act "symlink $link -> $src" ln -s "$src" "$link"
+  fi
+  case ":$PATH:" in
+    *":$bindir:"*) : ;;
+    *)
+      # Decorative note; the ~ is literal message text, not a path operand.
+      # shellcheck disable=SC2088
+      log "fleet: NOTE: ~/.local/bin is not on your PATH — add it, or run $src directly." ;;
+  esac
+  log "fleet: ready — try 'pit-wall spawn implementer \"...\"' (see docs/fleet-mode.md)."
+}
+
+# ---------------------------------------------------------------------
 # 0. Determine the target: a de-duplicated set of harnesses to install,
 #    selected from {opencode, claude, codex, antigravity}. See expand_target
 #    above for the alias rules.
@@ -504,6 +593,15 @@ else
 fi
 log "Selected profile: $PROFILE ($REASON)"
 
+# Optional fleet-mode setup is off unless requested. When interactive and not
+# already decided by --fleet/--no-fleet, offer it once (default no).
+if [ "$FLEET_EXPLICIT" != "1" ] && [ -t 0 ] && [ "$DRY_RUN" != "1" ]; then
+  fleet_ans=""
+  read -r -p "Set up optional fleet mode (tmux orchestration)? [y/N]: " fleet_ans || fleet_ans=""
+  case "$fleet_ans" in y|Y|yes|YES|Yes) FLEET=1 ;; *) FLEET=0 ;; esac
+fi
+[ "$FLEET" = "1" ] && log "Fleet mode: will set up (optional; needs tmux)."
+
 if [ "$DRY_RUN" = "1" ]; then
   log "[dry-run] mode: no files will be created, moved, or symlinked."
 fi
@@ -538,6 +636,12 @@ if [ "$SEL_ANTIGRAVITY" = "1" ]; then
   install_antigravity
 fi
 
+if [ "$FLEET" = "1" ]; then
+  log ""
+  log "== fleet (optional) =="
+  install_fleet
+fi
+
 log ""
 log "install.sh: done (target=$TARGET, profile=$PROFILE, dry-run=$DRY_RUN)."
 if [ "$SEL_OPENCODE" = "1" ]; then
@@ -549,17 +653,34 @@ fi
 # ---------------------------------------------------------------------
 # 3. Post-install verify: re-run the health checks so a broken install is
 #    caught immediately instead of at the next agent invocation. Runs once,
-#    regardless of which subset of steps was selected. validate.mjs is the
-#    hard check (its own abort-on-failure gates already ran earlier in this
-#    script, per selected step; here its output is just surfaced, not
-#    re-enforced). doctor.sh is advisory and always exits 0.
+#    regardless of which subset of steps was selected -- but scoped to only
+#    the platform(s) actually selected this run (one `--platform <name>`
+#    call per selected SEL_* flag, in the same fixed order as the install
+#    steps above), so e.g. `install.sh --target codex` doesn't surface
+#    unrelated OpenCode config errors. validate.mjs is the hard check (its
+#    own abort-on-failure gates already ran earlier in this script, per
+#    selected step; here its output is just surfaced, not re-enforced).
+#    doctor.sh is advisory, not platform-specific, and always exits 0 -- it
+#    still runs unconditionally.
 # ---------------------------------------------------------------------
 
 log ""
 log "Post-install verification:"
 if [ "$DRY_RUN" = "1" ]; then
-  log "[dry-run] would: run scripts/validate.mjs + scripts/doctor.sh (post-install verify)"
+  for entry in "opencode:$SEL_OPENCODE" "claude:$SEL_CLAUDE" "codex:$SEL_CODEX" "antigravity:$SEL_ANTIGRAVITY"; do
+    platform="${entry%%:*}"
+    selected="${entry##*:}"
+    [ "$selected" = "1" ] && log "[dry-run] would: run scripts/validate.mjs --platform $platform"
+  done
+  log "[dry-run] would: run scripts/doctor.sh (advisory, always runs)"
 else
-  node "$REPO_ROOT/scripts/validate.mjs" || true
+  for entry in "opencode:$SEL_OPENCODE" "claude:$SEL_CLAUDE" "codex:$SEL_CODEX" "antigravity:$SEL_ANTIGRAVITY"; do
+    platform="${entry%%:*}"
+    selected="${entry##*:}"
+    if [ "$selected" = "1" ]; then
+      log "-> node scripts/validate.mjs --platform $platform"
+      node "$REPO_ROOT/scripts/validate.mjs" --platform "$platform" || true
+    fi
+  done
   bash "$REPO_ROOT/scripts/doctor.sh" || true
 fi

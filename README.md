@@ -89,6 +89,7 @@ shapes what the agents do autonomously; it is not a security boundary.
 git clone <this-repo>
 cd <this-repo>
 ./bootstrap.sh            # auto-detects platforms + profile, prompts to confirm in a terminal
+# ./bootstrap.sh --fleet  # ...same, plus optional fleet mode (tmux orchestration) — see below
 ```
 
 `./bootstrap.sh` is a thin wrapper at the repo root that forwards every
@@ -98,7 +99,10 @@ set of harnesses actually present on this machine (OpenCode, Claude Code,
 Codex, and/or Antigravity/Gemini), asks you to confirm the detected
 profile/target when run in a terminal, and finishes with a post-install
 verification pass (`scripts/validate.mjs` then `scripts/doctor.sh`).
-`--profile`, `--target`, and `--dry-run` still work as explicit overrides.
+`--profile`, `--target`, and `--dry-run` still work as explicit overrides, and
+`--fleet` / `--no-fleet` opt into or out of the optional
+[fleet mode](#fleet-mode-optional) setup (in a terminal you're asked once if
+neither is given).
 
 `--target` is a comma-separated list of any subset of `opencode`, `claude`,
 `codex`, `antigravity` (alias: `gemini`), run in that fixed order. Two
@@ -111,7 +115,8 @@ for `--target codex`/`all`.
 Before or after installing, `bash scripts/doctor.sh` is a standalone
 preflight/health check: it prints one `MISSING: <thing> (install: <cmd>)`
 line per problem (Node ≥ 20, OpenCode, `~/.claude`, Codex, live install
-symlinks), stays silent when everything is healthy, and always exits `0`.
+symlinks, and `tmux` if fleet mode is installed), stays silent when everything
+is healthy, and always exits `0`.
 
 What the installer does, per selected step, always in this fixed order
 regardless of the order given on the command line:
@@ -135,6 +140,11 @@ regardless of the order given on the command line:
 3. **`codex`** (part of `all` only): see [Codex](#codex) below.
 4. **`antigravity`**/`gemini` (part of `all` only): delegates to
    `antigravity/install.sh` — see that script's own header for details.
+5. **`fleet`** (optional; only with `--fleet`, or by answering yes to the
+   terminal prompt): checks for `tmux` and symlinks the `pit-wall` CLI into
+   `~/.local/bin` so fleet mode is on your `PATH`. If `tmux` isn't installed
+   it warns and skips rather than failing. See
+   [Fleet mode](#fleet-mode-optional).
 
 Finally, regardless of which steps were selected, the installer re-runs
 `node scripts/validate.mjs` and `bash scripts/doctor.sh` once as a
@@ -147,6 +157,20 @@ truth and `git pull` updates your live setup. The script is safe to re-run.
 Then start `opencode` in any project and select the `tech-lead` agent (it
 registers as a primary agent) — hand it a multi-step feature request and let
 it delegate. Small single edits are cheaper done directly with a worker.
+
+## Fleet mode (optional)
+
+Want to fire off several **independent** tasks in parallel and walk away,
+instead of one delegation at a time inside a `tech-lead` session?
+`scripts/fleet/pit-wall.sh` spawns each role as its own top-level `opencode`
+process in its own tmux window and supervises the fleet from a live "pit
+wall" board (`spawn`, `view --watch`, `attach`, `teardown`, …). It needs
+`tmux`, and it is a genuinely separate mode, not an alternative front end for
+the same thing: it **bypasses the permission-enforced tech-lead → worker
+hierarchy** above, so reach for it on unrelated parallel tasks, and reach for
+in-session orchestration when you want the enforced brief/review contract on
+one body of work. Commands, statuses, and config:
+[docs/fleet-mode.md](docs/fleet-mode.md).
 
 ## Model routing
 

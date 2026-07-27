@@ -41,8 +41,8 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // validate.mjs asserts this map covers exactly the six agents, so a
 // seventh agent can't silently ship an untier'd (inherit-model) mirror.
 export const CLAUDE_MODEL_BY_AGENT = {
-  'tech-lead': 'fable',       // strongest — planning/routing quality dominates cost
-  'senior-dev': 'fable',      // strongest — design, security, schema, concurrency
+  'tech-lead': 'opus',       // strongest — planning/routing quality dominates cost
+  'senior-dev': 'opus',      // strongest — design, security, schema, concurrency
   'implementer': 'sonnet',    // mid — well-briefed feature work
   'boilerplate': 'haiku',     // cheapest — mechanical work only
   'code-reviewer': 'sonnet',  // mid — fault-finding on a fixed diff

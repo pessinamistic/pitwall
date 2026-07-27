@@ -57,6 +57,10 @@ Both are valid; this repo doesn't force either:
 
 ## Entries
 
+- [2026-07-22] Antigravity (`agy`) only discovers custom agents from a *dedicated subdirectory* — `.agents/agents/<name>/agent.md` (workspace) or `~/.gemini/config/agents/<name>/agent.md` (global). A loose file directly under either parent dir is silently not discovered — evidence: https://antigravity.google/docs/cli/commands/agents (fetched 2026-07-22); confirmed via `agy agent` listing all six `oc-*` agents once symlinked into the dedicated subdirs.
+- [2026-07-22] Antigravity `agent.md` frontmatter only confirms `name`, `description`, and `model` (values `flash`/`pro`/`inherit`, default `inherit`) — no frontmatter field exists for write/subagent-tool permissions; express that as prose in the body instead — evidence: scripts/sync-antigravity-agents.mjs, antigravity/README.md.
+- [2026-07-22] `agy agent` (bare CLI list) can return an empty list even when a correctly-shaped `.agents/agents/<name>/agent.md` exists at workspace scope only — but reliably lists agents once the same names also exist at global scope (`~/.gemini/config/agents/`). Cause not fully isolated; if a workspace-only agent doesn't show up, install it globally too (`antigravity/install.sh`) before assuming the file format is wrong — evidence: this session's throwaway workspace-only probe (not listed) vs. the `oc-*` agents at both scopes (listed), both via `agy agent`.
+
 <!--
 Example (delete this comment; real entries go above it):
 - [2026-01-15] `npm test` needs `DATABASE_URL` set even for unit tests — evidence: package.json:12

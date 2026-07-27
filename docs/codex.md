@@ -81,11 +81,16 @@ Notes from verification, so nobody re-guesses these:
 
 In an interactive Codex session at this repo root (trusted project):
 
-1. Ask Codex to delegate — e.g. "spawn code-reviewer on this diff". Codex
-   selects custom agents by their `description`; the `/agent` command
-   (alias `/subagents`) switches between spawned agent threads to inspect
-   their work. (There is no `/agents` management picker — that was another
-   stale claim; agent files are managed on disk.)
+1. Ask Codex to delegate by **name** — e.g. "spawn code-reviewer on this
+   diff" or "use senior-dev to design the schema". Custom agents are
+   invoked by their registered `name`, not selected via a `description`
+   match. The `/agent` command (alias `/subagents`) switches between
+   spawned agent threads to inspect their work. An `/agents` picker also
+   exists, but its visibility has been inconsistent across CLI versions —
+   see the open upstream bug
+   [openai/codex#15250](https://github.com/openai/codex/issues/15250). If
+   `/agents` doesn't show your custom agents, invoking by name directly in
+   chat still works.
 2. Verify `code-reviewer` reports findings without editing (read-only
    sandbox + instructions).
 3. Verify `boilerplate` runs on `gpt-5.6-luna` at `low` effort (visible in
@@ -102,6 +107,8 @@ In an interactive Codex session at this repo root (trusted project):
   <https://developers.openai.com/codex/models.md>
 - Slash commands — `/agent` (alias `/subagents`) thread switcher:
   <https://developers.openai.com/codex/cli/slash-commands.md>
+- Known `/agents` picker visibility bug — openai/codex#15250 (invoke by name in chat as the
+  reliable path instead): <https://github.com/openai/codex/issues/15250>
 
 (The `developers.openai.com/codex/*` URLs 308-redirect to
 `learn.chatgpt.com/docs/*` — same official docs, either host works.)
