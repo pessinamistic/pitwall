@@ -42,7 +42,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // seventh agent can't silently ship an untier'd (inherit-model) mirror.
 export const CLAUDE_MODEL_BY_AGENT = {
   'tech-lead': 'opus',       // strongest — planning/routing quality dominates cost
-  'senior-dev': 'opus',      // strongest — design, security, schema, concurrency
+  'senior-dev': 'sonnet',      // strongest — design, security, schema, concurrency
   'implementer': 'sonnet',    // mid — well-briefed feature work
   'boilerplate': 'haiku',     // cheapest — mechanical work only
   'code-reviewer': 'sonnet',  // mid — fault-finding on a fixed diff
