@@ -11,6 +11,10 @@ chatgpt_output.txt
 # node
 node_modules/
 
+# local git worktrees parked by EnterWorktree / fleet tooling — never committed
+# (a nested checkout here contains a .git file with an absolute gitdir path)
+.claude/worktrees/
+
 # benchmark output (keep the directory, ignore the runs)
 benchmarks/results/*
 !benchmarks/results/.gitkeep

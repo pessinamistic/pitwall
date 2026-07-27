@@ -502,9 +502,22 @@ function validateFleetAgentFiles() {
 // (g) no leaked machine-specific paths / username
 // ---------------------------------------------------------------------
 
+// Entries that must never be walked when scanning for leaked machine-specific
+// paths. `.git` in a *checked-out worktree* is a file (not a dir) that git
+// fills with an absolute "gitdir:" line pointing under the user's home dir by
+// its own design — reading it would trip the hardcoded-username / home-path
+// checks below. node_modules is third-party. `.claude/worktrees` is where this
+// project's own EnterWorktree / fleet tooling parks local git worktrees (see
+// .gitignore); a nested checkout there is never part of the tree we validate.
+const LEAK_SCAN_SKIP_NAMES = new Set(['.git', 'node_modules']);
+const LOCAL_WORKTREES_DIR = path.join(REPO_ROOT, '.claude', 'worktrees');
+
 function walk(dir, cb) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
+    if (LEAK_SCAN_SKIP_NAMES.has(entry.name) || full === LOCAL_WORKTREES_DIR) {
+      continue;
+    }
     if (entry.isDirectory()) {
       walk(full, cb);
     } else if (entry.isFile()) {
