@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generates .agents/agents/oc-<role>/agent.md (native Antigravity custom
+// Generates .agents/agents/<role>/agent.md (native Antigravity custom
 // agent files) from agents/<role>.md — same single-source model as the
 // Claude Code and Codex mirrors. Zero npm dependencies (Node >= 20). See
 // antigravity/README.md.
@@ -74,6 +74,32 @@ const WRITE_RESTRICTION_NOTE = {
     'you report findings; you never edit files.',
 };
 
+// Antigravity has no in-session sub-agent invocation and no Task tool (unlike
+// the OpenCode/Claude Code source these bodies are ported from). The tech-lead
+// body talks about delegating and even references "the Task tool" (correct for
+// its OpenCode/Claude Code origin, wrong here) — so append an Antigravity-
+// specific correction telling the interactively-running agent NOT to attempt a
+// live invocation or guess agent-name strings, and what to do instead. Same
+// append mechanism as WRITE_RESTRICTION_NOTE.
+const ANTIGRAVITY_DELEGATION_NOTE = {
+  'tech-lead':
+    '**Antigravity note — no live delegation:** this integration has no ' +
+    'in-session sub-agent invocation and no Task tool. The six team agents ' +
+    'are separate Antigravity custom agents that a human selects one at a ' +
+    'time from the `/agents` panel — you cannot call a sibling agent from ' +
+    'inside your own session, and any attempt (an `invoke_subagent`/' +
+    '`SendMessage`-style call, or guessing a recipient/agent name) will ' +
+    'fail. So when work needs delegating: do not attempt an in-session ' +
+    'invocation and do not burn turns guessing agent-name strings. Instead, ' +
+    'produce the task brief and hand it off one of two ways — (i) tell the ' +
+    'human to switch to the target agent in the `/agents` panel and paste ' +
+    'the brief, or (ii) if it should run standalone, tell them to launch it ' +
+    'from a terminal with fleet mode: `scripts/fleet/pit-wall.sh spawn ' +
+    '<role> --backend antigravity "<brief>"`. This supersedes the "invoke ' +
+    'it again through the Task tool" line above — there is no Task tool in ' +
+    'the Antigravity integration.',
+};
+
 function parseArgs(argv) {
   let profile = 'personal';
   let check = false;
@@ -122,7 +148,7 @@ export function buildAgentMd(role, frontmatter, body, modelTier) {
 
   const lines = [];
   lines.push('---');
-  lines.push(`name: oc-${role}`);
+  lines.push(`name: ${role}`);
   lines.push(`description: "${escapeYamlDoubleQuoted(description)}"`);
   lines.push(`model: ${modelTier}`);
   lines.push('---');
@@ -133,10 +159,11 @@ export function buildAgentMd(role, frontmatter, body, modelTier) {
   ];
 
   let outBody = body;
-  const note = WRITE_RESTRICTION_NOTE[role];
-  if (note) {
-    // Normalize to exactly one trailing newline, then append the note as
-    // its own paragraph, then restore a single trailing newline.
+  // Normalize to exactly one trailing newline, then append each note as its
+  // own paragraph, then restore a single trailing newline. Write-restriction
+  // note first, then the delegation correction (tech-lead only).
+  const notes = [WRITE_RESTRICTION_NOTE[role], ANTIGRAVITY_DELEGATION_NOTE[role]].filter(Boolean);
+  for (const note of notes) {
     outBody = outBody.replace(/\n+$/, '\n') + '\n' + note + '\n';
   }
 
@@ -195,7 +222,7 @@ function main() {
       process.exit(1);
     }
 
-    const outDir = path.join(outBaseDir, `oc-${role}`);
+    const outDir = path.join(outBaseDir, role);
     const outPath = path.join(outDir, 'agent.md');
     const existing = fs.existsSync(outPath) ? fs.readFileSync(outPath, 'utf8') : null;
     if (existing === output) {
@@ -205,7 +232,7 @@ function main() {
     if (check) {
       stale++;
       console.error(
-        `sync-antigravity-agents.mjs: .agents/agents/oc-${role}/agent.md is ` +
+        `sync-antigravity-agents.mjs: .agents/agents/${role}/agent.md is ` +
           `${existing === null ? 'missing' : 'stale'} — re-run \`node scripts/sync-antigravity-agents.mjs\`.`
       );
       continue;

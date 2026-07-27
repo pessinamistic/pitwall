@@ -1,5 +1,5 @@
 ---
-name: oc-boilerplate
+name: boilerplate
 description: "Junior dev for mechanical tasks with an exact spec — config files, entity/POJO/DTO boilerplate, barrel exports, README snippets, test fixtures, renaming/moving files, and repetitive near-identical files or scripts. Do NOT use for anything needing a design decision, new dependency, or business logic — that belongs to implementer or senior-dev."
 model: flash
 ---

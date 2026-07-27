@@ -2,47 +2,57 @@
 
 The six-role engineering team is available as real, pre-registered
 Antigravity custom agents — there is no `define_subagent` step. Each is a
-dedicated `agents/oc-<role>/agent.md` file (workspace-scoped copy in this
+dedicated `agents/<role>/agent.md` file (workspace-scoped copy in this
 repo at `.agents/agents/`, plus a global copy symlinked to
 `~/.gemini/config/agents/` by `antigravity/install.sh`) that Antigravity
-discovers on its own. Select one directly from the `/agents` picker, or
-invoke one by name if the current session supports that. See
-`antigravity/README.md` for how the files get there.
+discovers on its own. See `antigravity/README.md` for how the files get
+there.
+
+There is no in-session sub-agent invocation in this integration — a human
+selects an agent from the `/agents` panel one at a time, and an agent
+cannot call a sibling from inside its own session. When the driving agent
+(especially `tech-lead`) needs to delegate, it must NOT attempt a live
+invocation or guess agent-name strings. Instead it produces the task brief
+and hands it off one of two ways: (i) the human switches to the target
+agent in the `/agents` panel and pastes the brief, or (ii) it is run
+standalone from a terminal via fleet mode —
+`scripts/fleet/pit-wall.sh spawn <role> --backend antigravity "<brief>"`
+(see `docs/fleet-mode.md`).
 
 This guidance applies to whichever agent is currently driving the
-conversation — the primary Antigravity assistant, or `oc-tech-lead` once
+conversation — the primary Antigravity assistant, or `tech-lead` once
 selected — when deciding how to route work across the team.
 
 ## The Team
 
-- **oc-tech-lead** (orchestrator, `pro`): decomposes work, delegates to
+- **tech-lead** (orchestrator, `pro`): decomposes work, delegates to
   workers, gates on review, reports consolidated status. Orchestrates and
   delegates rather than writing code directly; may edit as a last resort
   (the source permission is an escape hatch requiring confirmation, not an
   absolute block).
-- **oc-senior-dev** (worker, `pro`): architecture, security, schema,
+- **senior-dev** (worker, `pro`): architecture, security, schema,
   concurrency, risky-diff review.
-- **oc-implementer** (worker, `inherit`): well-scoped feature work with
+- **implementer** (worker, `inherit`): well-scoped feature work with
   clear file paths and patterns to follow.
-- **oc-boilerplate** (worker, `flash`): mechanical tasks — config, shells,
+- **boilerplate** (worker, `flash`): mechanical tasks — config, shells,
   fixtures, renames. Zero judgment.
-- **oc-code-reviewer** (specialist, `pro`): read-only diff review. Never
+- **code-reviewer** (specialist, `pro`): read-only diff review. Never
   edits files. Reports findings with file:line and severity.
-- **oc-debugger** (specialist, `pro`): root cause analysis via
+- **debugger** (specialist, `pro`): root cause analysis via
   reproduce → isolate → diagnose → fix.
 
 ## When to Use the Team
 
-- **oc-tech-lead**: multi-step feature requests, project-wide changes,
+- **tech-lead**: multi-step feature requests, project-wide changes,
   anything needing decomposition and coordination.
-- **oc-senior-dev**: module/service design, security config, schema and
+- **senior-dev**: module/service design, security config, schema and
   migrations, caching, concurrency, reviewing risky diffs.
-- **oc-implementer**: CRUD endpoints, UI components, DTOs/mappers, standard
+- **implementer**: CRUD endpoints, UI components, DTOs/mappers, standard
   tests, Docker/CI yaml — needs clear file paths and a pattern to imitate.
-- **oc-boilerplate**: config files, entity shells, fixtures, renames,
+- **boilerplate**: config files, entity shells, fixtures, renames,
   repetitive files. Zero-judgment mechanical work only.
-- **oc-code-reviewer**: independent diff review. Never edits files.
-- **oc-debugger**: failing tests, stack traces, unclear breakage.
+- **code-reviewer**: independent diff review. Never edits files.
+- **debugger**: failing tests, stack traces, unclear breakage.
 
 Not every request needs the team — a one-line edit or a quick question
 should be answered directly rather than routed through a worker.

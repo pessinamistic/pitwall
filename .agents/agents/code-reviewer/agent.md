@@ -1,5 +1,5 @@
 ---
-name: oc-code-reviewer
+name: code-reviewer
 description: "Reviews a diff or changeset for correctness, security, and pattern adherence — reports findings with file:line and severity, never edits. Use before merging risky work (migrations, auth surfaces, concurrency, core business logic) or when you want an independent read on another agent's output. Not for writing code or fixing what it finds."
 model: pro
 ---

@@ -41,9 +41,9 @@ behavior from before this flag existed):
   Note the `fleet-` prefix: see "The opencode backend: fleet-`<role>`
   agents" below for why a top-level fleet task can't just target the bare
   `<role>` name the rest of this repo uses.
-- **`antigravity`** — `agy --agent oc-<role> --print "<brief>"`, routing the
+- **`antigravity`** — `agy --agent <role> --print "<brief>"`, routing the
   task through your Antigravity/Gemini account instead of paid Claude/OpenCode
-  credits. Targets the `oc-<role>` custom agents that `antigravity/install.sh`
+  credits. Targets the `<role>` custom agents that `antigravity/install.sh`
   installs (see [`antigravity/README.md`](../antigravity/README.md)) — run
   that installer at least once first, and make sure `agy` is authenticated.
   `agy` calls are subject to your account's own plan quota; a spawned task can
@@ -128,9 +128,10 @@ each role under `agents/fleet/fleet-<role>.md` — `fleet-tech-lead`,
 `fleet-senior-dev`, `fleet-implementer`, `fleet-boilerplate`,
 `fleet-code-reviewer`, `fleet-debugger` — and `scripts/fleet/lib/common.sh`'s
 `fleet_build_launch_cmd` targets that name instead of the bare role name
-for the `opencode` backend (the `antigravity` backend already targeted its
-own distinct `oc-<role>` names and needed no change). Every field from the
-source frontmatter is carried over **verbatim** except `mode` —
+for the `opencode` backend (the `antigravity` backend targets its `<role>`
+custom agents directly and needed no such `fleet-` rename — Antigravity has
+no primary/subagent distinction, so the bare role names work there). Every
+field from the source frontmatter is carried over **verbatim** except `mode` —
 `permission.task: deny`, `permission.edit`, and every `bash` pattern map
 are reproduced exactly, so a fleet-spawned worker keeps its existing
 restrictions rather than a loosened copy of them — and the markdown body is

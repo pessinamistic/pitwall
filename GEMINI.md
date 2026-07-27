@@ -6,30 +6,38 @@ execute the work hierarchically.
 
 ## Available Engineering Agents
 
-These agents are registered as Antigravity subagents with the `oc-` prefix.
-Each is a real, pre-registered custom agent — a dedicated
-`agents/oc-<role>/agent.md` file (workspace-scoped copy in this repo at
-`.agents/agents/`, plus a global copy symlinked to
+These agents are real, pre-registered Antigravity custom agents (no name
+prefix). Each is a dedicated `agents/<role>/agent.md` file (workspace-scoped
+copy in this repo at `.agents/agents/`, plus a global copy symlinked to
 `~/.gemini/config/agents/` by `antigravity/install.sh`) that Antigravity
-discovers on its own. There is no `define_subagent` step — select one
-directly from the `/agents` picker, or invoke one by name if the current
-session supports that. See `antigravity/README.md` for how the files get
+discovers on its own. See `antigravity/README.md` for how the files get
 there.
+
+There is no in-session sub-agent invocation in this integration — a human
+selects an agent from the `/agents` panel one at a time, and an agent cannot
+call a sibling from inside its own session. When the driving agent
+(especially `tech-lead`) needs to delegate, it must NOT attempt a live
+invocation or guess agent-name strings. Instead it produces the task brief
+and hands it off one of two ways: (i) the human switches to the target agent
+in the `/agents` panel and pastes the brief, or (ii) it is run standalone
+from a terminal via fleet mode —
+`scripts/fleet/pit-wall.sh spawn <role> --backend antigravity "<brief>"`
+(see `docs/fleet-mode.md`).
 
 ### Delegation Hierarchy
 
-- **oc-tech-lead** (orchestrator, `pro` model): Decomposes work, delegates
+- **tech-lead** (orchestrator, `pro` model): Decomposes work, delegates
   to workers, gates on review, reports consolidated status. Does NOT write
   code.
-- **oc-senior-dev** (worker, `pro` model): Architecture, security, schema,
+- **senior-dev** (worker, `pro` model): Architecture, security, schema,
   concurrency, risky diff review.
-- **oc-implementer** (worker, `inherit` model): Well-scoped feature work
+- **implementer** (worker, `inherit` model): Well-scoped feature work
   with clear file paths and patterns to follow.
-- **oc-boilerplate** (worker, `flash` model): Mechanical tasks — config,
+- **boilerplate** (worker, `flash` model): Mechanical tasks — config,
   shells, fixtures, renames. Zero judgment.
-- **oc-code-reviewer** (specialist, `pro` model): Read-only diff review.
+- **code-reviewer** (specialist, `pro` model): Read-only diff review.
   Never edits files. Reports findings with file:line and severity.
-- **oc-debugger** (specialist, `pro` model): Root cause analysis via
+- **debugger** (specialist, `pro` model): Root cause analysis via
   reproduce → isolate → diagnose → fix.
 
 ### When NOT to use the engineering team
