@@ -48,14 +48,14 @@ the hard calls, and a garage crew that executes.
 <img src="assets/roster.svg" alt="The six roles — tech-lead (Race Engineer), senior-dev (Technical Director), implementer (Mechanic), boilerplate (Tyre Tech), code-reviewer (Scrutineer), debugger (Telemetry Engineer)" width="100%">
 </div>
 
-| Agent           | Role                                                                                                                       | Tier intent         | The tech lead routes here when…                                                                                  |
-|-----------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------------------------------------------------------------------------------|
-| `tech-lead`     | Primary orchestrator: decomposes requests, writes briefs, sequences work, enforces review, reports status                  | strongest available | — (this is the entry point; every multi-step request starts here)                                                |
-| `senior-dev`    | Design, security config, schema/migrations, messaging, caching, concurrency; reviews risky diffs                           | large / strong mid  | the task needs judgment: architecture, auth, schema design, async pipelines, or an architectural read on a diff  |
-| `implementer`   | Well-scoped feature work: CRUD endpoints, DTOs/mappers, UI from the existing design system, standard tests, Docker/CI yaml | code-tuned mid      | the task is fully specified and needs no design decisions — it stops and punts if one appears                    |
-| `boilerplate`   | Mechanical work: config files, entity/DTO shells, fixtures, renames, repetitive near-identical files                       | cheapest available  | there is zero judgment involved; capped at 20 agentic steps so a misroute fails loudly instead of burning budget |
-| `code-reviewer` | Reviews a diff and reports numbered `file:line` findings with severity — never edits                                       | reasoning-tuned     | it wants pure review signal on another agent's output, without the fix being silently applied                    |
-| `debugger`      | Reproduce → isolate → diagnose → minimal fix, with root cause and fix reported separately                                  | reasoning-tuned     | something is broken and the cause is unknown (known-cause changes go to `implementer`/`senior-dev` instead)      |
+| Agent           | F1 Title             | Role                                                                                                                       | Tier intent         | The tech lead routes here when…                                                                                  |
+|-----------------|----------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------------------------------------------------------------------------------|
+| `tech-lead`     | Race Engineer        | Primary orchestrator: decomposes requests, writes briefs, sequences work, enforces review, reports status                  | strongest available | — (this is the entry point; every multi-step request starts here)                                                |
+| `senior-dev`    | Technical Director   | Design, security config, schema/migrations, messaging, caching, concurrency; reviews risky diffs                           | large / strong mid  | the task needs judgment: architecture, auth, schema design, async pipelines, or an architectural read on a diff  |
+| `implementer`   | Race Mechanic        | Well-scoped feature work: CRUD endpoints, DTOs/mappers, UI from the existing design system, standard tests, Docker/CI yaml | code-tuned mid      | the task is fully specified and needs no design decisions — it stops and punts if one appears                    |
+| `boilerplate`   | Tyre Technician      | Mechanical work: config files, entity/DTO shells, fixtures, renames, repetitive near-identical files                       | cheapest available  | there is zero judgment involved; capped at 20 agentic steps so a misroute fails loudly instead of burning budget |
+| `code-reviewer` | FIA Scrutineer       | Reviews a diff and reports numbered `file:line` findings with severity — never edits                                       | reasoning-tuned     | it wants pure review signal on another agent's output, without the fix being silently applied                    |
+| `debugger`      | Telemetry Engineer   | Reproduce → isolate → diagnose → minimal fix, with root cause and fix reported separately                                  | reasoning-tuned     | something is broken and the cause is unknown (known-cause changes go to `implementer`/`senior-dev` instead)      |
 
 ## How orchestration is enforced
 
@@ -157,6 +157,9 @@ truth and `git pull` updates your live setup. The script is safe to re-run.
 Then start `opencode` in any project and select the `tech-lead` agent (it
 registers as a primary agent) — hand it a multi-step feature request and let
 it delegate. Small single edits are cheaper done directly with a worker.
+
+For a complete walkthrough of a feature from `cd` to merge, mapped to the
+F1 race weekend metaphor: [docs/race-weekend.md](docs/race-weekend.md).
 
 ## Fleet mode (optional)
 

@@ -89,3 +89,6 @@ Your final message is consumed by the tech lead, not the user. Return:
    fix it" diffs — that is the author's or the tech lead's decision to make.
 
 Keep it under ~30 lines unless the finding count genuinely requires more.
+
+No findings at any severity: *Scrutineering passed. Car is legal.*
+Blockers present: *Not cleared for parc fermé — N blocker(s) must be resolved.*

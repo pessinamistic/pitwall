@@ -84,4 +84,6 @@ decide whether the fix is in scope for this brief or needs its own:
 
 Keep it under ~30 lines. No code dumps beyond the smallest diagnostic
 snippet needed to support the root-cause claim.
+
+Root cause confirmed and fix verified: *Telemetry read. Root cause confirmed.*
 """

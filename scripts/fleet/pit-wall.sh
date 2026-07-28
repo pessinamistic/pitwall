@@ -40,13 +40,20 @@ _last_line() {
 }
 
 _mark() {
+  # ANSI colour codes to match F1 flag conventions:
+  #   running  -> green  flag (race is on)
+  #   idle     -> yellow flag (caution)
+  #   WEDGED   -> red    flag (session halted, needs human)
+  #   done     -> white  + checkered symbol (race complete)
+  #   gone     -> dark grey (black flag — disqualified / window lost)
+  local GREEN='\033[32m' YELLOW='\033[33m' RED='\033[31m' WHITE='\033[37m' GREY='\033[90m' RESET='\033[0m'
   case "$1" in
-    running) printf 'running' ;;
-    idle)    printf 'idle'    ;;
-    wedged)  printf 'WEDGED'  ;;
-    done)    printf 'done'    ;;
-    gone)    printf 'gone'    ;;
-    *)       printf '%s' "$1" ;;
+    running) printf '%s%s%s' "$GREEN"  'running' "$RESET" ;;
+    idle)    printf '%s%s%s' "$YELLOW" 'idle'    "$RESET" ;;
+    wedged)  printf '%s%s%s' "$RED"    'WEDGED'  "$RESET" ;;
+    done)    printf '%s%s%s' "$WHITE"  'done ✓'  "$RESET" ;;
+    gone)    printf '%s%s%s' "$GREY"   'gone'    "$RESET" ;;
+    *)       printf '%s' "$1"                             ;;
   esac
 }
 

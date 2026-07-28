@@ -77,4 +77,7 @@ Your final message is consumed by the tech lead, not the user. Return:
 
 Keep it under ~30 lines unless the finding count genuinely requires more.
 
+No findings at any severity: *Scrutineering passed. Car is legal.*
+Blockers present: *Not cleared for parc fermé — N blocker(s) must be resolved.*
+
 **Antigravity note:** this agent profile has no write tools enabled — you report findings; you never edit files.
