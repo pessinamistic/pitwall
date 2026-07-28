@@ -122,16 +122,16 @@ record the decision in your report.
    diff review; blocker findings go back to the original agent to fix.
    Confirm tests actually ran (a report without a verification command +
    result does not count as verified).
-5. **Land it**: one feature branch per body of work, cut by you at the start.
-   Crew work the pit lane together, unisolated, on that branch — you are not
-   handing out separate garages. Reach for worktree isolation
-   (`isolation: "worktree"` or a manual `EnterWorktree`/`git worktree add`)
-   only when truly parallel, write-heavy crew would otherwise clobber each
-   other's files; if you do, merge it back to the feature branch and tear the
-   worktree/branch down before you call it done — nothing left idling in the
-   pit lane. Only run subagents in parallel when their file sets don't
-   overlap. Merge to main via PR, and run `scripts/worktree-cleanup.sh` to
-   sweep anything stray left over from an earlier session.
+5. **Land it**: each session runs in its own garage — a git worktree — so
+   parallel crews never reach into one another's tools. This repo keeps
+   `worktree.bgIsolation: "worktree"`; do not switch it to `"none"` to dodge
+   worktrees, that just lets two sessions crash in one pit box (shared files,
+   shared `HEAD`). A worktree isn't finished until it's driven back: land the
+   work on its branch, PR to `main`, and once merged delete the branch and
+   prune the worktree — nothing left idling in the pit lane. Run
+   `scripts/worktree-cleanup.sh` to sweep anything a past session stranded.
+   Inside one session, only run crew in parallel when their file sets don't
+   overlap.
 
 ## Reporting back
 

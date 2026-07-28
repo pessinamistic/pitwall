@@ -25,6 +25,23 @@ policy — how the roles work together, whoever is playing them.
 - Do not claim verification that was not run. Report skipped checks and blockers
   plainly.
 
+## Branching model
+
+- Each session works in its OWN git worktree. This repo keeps
+  `worktree.bgIsolation: "worktree"` set (`.claude/settings.json`) so background
+  agents cannot write a shared checkout until they isolate. Do NOT flip that to
+  `"none"` to "avoid worktrees": with more than one session in the repo, an
+  un-isolated shared checkout lets them overwrite each other's files and move
+  each other's `HEAD`.
+- A worktree is not done until it is MERGED BACK and REMOVED. Land the work on
+  its branch, PR to `main`, and once merged delete the branch and prune the
+  worktree. A worktree left behind after its work merged is the bug — not the
+  worktree itself.
+- Run `scripts/worktree-cleanup.sh` (dry-run by default; `--apply` to act) to
+  sweep worktrees/branches left dangling by earlier sessions.
+- Within one session, only parallelize subagents when they touch disjoint
+  files; sequence anything that would write the same file(s).
+
 ## Role selection
 
 | Role | Use for | Do not use for |

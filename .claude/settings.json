@@ -1,5 +1,5 @@
 {
   "worktree": {
-    "bgIsolation": "none"
+    "bgIsolation": "worktree"
   }
 }
