@@ -56,3 +56,5 @@ anything:
 
 Your final message is consumed by the tech lead, not the user. Return the list
 of files created/changed and what you verified, under 15 lines.
+
+No ambiguities, no extras: *Tyres fitted. Done.*

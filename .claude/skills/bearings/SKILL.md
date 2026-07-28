@@ -8,10 +8,10 @@ description: >-
   your decision / Recently done / Underway / Next up) written to a
   gitignored dated file plus a concise chat summary. Read-only: never edits
   code, never commits, never mutates project state. Use when the user
-  invokes /bearings or asks for a status report, morning brief, catch-up,
-  "where did I leave off," or "what's in progress," and during tech-lead
-  orientation on a repo that has (or should get) a fresh snapshot to work
-  from.
+  invokes /bearings or /debrief (aliases for the same thing), or asks for
+  a status report, morning brief, catch-up, "where did I leave off," or
+  "what's in progress," and during tech-lead orientation on a repo that has
+  (or should get) a fresh snapshot to work from.
 metadata:
   layer: practice
 ---
@@ -27,7 +27,8 @@ state as a side effect of producing the brief.
 
 ## When to use this
 
-Load this when the user invokes `/bearings` or asks for a status report,
+Load this when the user invokes `/bearings` or `/debrief` (both trigger this
+skill — they are aliases for the same thing) or asks for a status report,
 catch-up, "where did I leave off," or "what's in progress." `tech-lead`
 also checks for a same-day snapshot during its own orientation pass (see
 "Orienting yourself" in `agents/tech-lead.md`) and may generate a fresh one

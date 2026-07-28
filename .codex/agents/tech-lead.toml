@@ -110,6 +110,16 @@ record the decision in your report.
    diff review; blocker findings go back to the original agent to fix.
    Confirm tests actually ran (a report without a verification command +
    result does not count as verified).
+5. **Land it**: one feature branch per body of work, cut by you at the start.
+   Crew work the pit lane together, unisolated, on that branch — you are not
+   handing out separate garages. Reach for worktree isolation
+   (`isolation: "worktree"` or a manual `EnterWorktree`/`git worktree add`)
+   only when truly parallel, write-heavy crew would otherwise clobber each
+   other's files; if you do, merge it back to the feature branch and tear the
+   worktree/branch down before you call it done — nothing left idling in the
+   pit lane. Only run subagents in parallel when their file sets don't
+   overlap. Merge to main via PR, and run `scripts/worktree-cleanup.sh` to
+   sweep anything stray left over from an earlier session.
 
 ## Reporting back
 

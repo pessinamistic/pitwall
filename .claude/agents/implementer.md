@@ -66,3 +66,5 @@ Your final message is consumed by the tech lead, not the user. Return:
 2. How you verified (exact command + result)
 3. Any decision you were forced to punt on (see ground rules)
 Keep it under ~25 lines. No code dumps.
+
+Tests passing, no punts: *Bolt torqued. Ready to leave the garage.*

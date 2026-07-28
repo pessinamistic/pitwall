@@ -81,3 +81,5 @@ Your final message is consumed by the tech lead, not the user. Return:
 3. How you verified (exact test command + result)
 4. Anything blocked or deferred
    Keep it under ~30 lines. No code dumps unless a decision hinges on them.
+
+A clean result with no blockers and tests passing earns: *Architecture holds. We race.*
