@@ -326,10 +326,10 @@ install_opencode() {
   fi
 
   if [ "$DRY_RUN" = "1" ]; then
-    log "[dry-run] would: node scripts/validate.mjs"
+    log "[dry-run] would: node scripts/validate.mjs --profile $PROFILE"
   else
-    log "-> node scripts/validate.mjs"
-    if ! node "$REPO_ROOT/scripts/validate.mjs"; then
+    log "-> node scripts/validate.mjs --profile $PROFILE"
+    if ! node "$REPO_ROOT/scripts/validate.mjs" --profile "$PROFILE"; then
       echo "install.sh: validate.mjs failed — fix the errors above before installing." >&2
       exit 1
     fi
@@ -432,12 +432,12 @@ install_claude() {
 run_codex_generation() {
   if [ "$DRY_RUN" = "1" ]; then
     log "[dry-run] would: node scripts/sync-codex-agents.mjs --profile $PROFILE"
-    log "[dry-run] would: node scripts/validate.mjs --platform codex"
+    log "[dry-run] would: node scripts/validate.mjs --platform codex --profile $PROFILE"
   else
     log "-> node scripts/sync-codex-agents.mjs --profile $PROFILE"
     node "$REPO_ROOT/scripts/sync-codex-agents.mjs" --profile "$PROFILE"
-    log "-> node scripts/validate.mjs --platform codex"
-    if ! node "$REPO_ROOT/scripts/validate.mjs" --platform codex; then
+    log "-> node scripts/validate.mjs --platform codex --profile $PROFILE"
+    if ! node "$REPO_ROOT/scripts/validate.mjs" --platform codex --profile "$PROFILE"; then
       echo "install.sh: codex validation failed — fix the errors above." >&2
       exit 1
     fi
@@ -670,7 +670,7 @@ if [ "$DRY_RUN" = "1" ]; then
   for entry in "opencode:$SEL_OPENCODE" "claude:$SEL_CLAUDE" "codex:$SEL_CODEX" "antigravity:$SEL_ANTIGRAVITY"; do
     platform="${entry%%:*}"
     selected="${entry##*:}"
-    [ "$selected" = "1" ] && log "[dry-run] would: run scripts/validate.mjs --platform $platform"
+    [ "$selected" = "1" ] && log "[dry-run] would: run scripts/validate.mjs --platform $platform --profile $PROFILE"
   done
   log "[dry-run] would: run scripts/doctor.sh (advisory, always runs)"
 else
@@ -678,8 +678,8 @@ else
     platform="${entry%%:*}"
     selected="${entry##*:}"
     if [ "$selected" = "1" ]; then
-      log "-> node scripts/validate.mjs --platform $platform"
-      node "$REPO_ROOT/scripts/validate.mjs" --platform "$platform" || true
+      log "-> node scripts/validate.mjs --platform $platform --profile $PROFILE"
+      node "$REPO_ROOT/scripts/validate.mjs" --platform "$platform" --profile "$PROFILE" || true
     fi
   done
   bash "$REPO_ROOT/scripts/doctor.sh" || true
