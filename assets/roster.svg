@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1152 448" width="1152" height="448" role="img" aria-label="Scuderia team — six roles">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1152 492" width="1152" height="492" role="img" aria-label="Scuderia team — six roles">
   <defs><linearGradient id="card_0" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#16181e"/><stop offset="1" stop-color="#0b0c10"/></linearGradient>
     <linearGradient id="gold_0" x1="0" y1="0" x2="0" y2="1">
@@ -42,10 +42,10 @@
       <rect width="16" height="8" fill="#0a0b0e"/>
       <rect width="8" height="4" fill="#ffffff"/><rect x="8" y="4" width="8" height="4" fill="#ffffff"/></pattern>
     <clipPath id="mini_5"><path d="M311,26 A17,17 0 0 1 345,26 Z"/></clipPath></defs>
-  <rect width="1152" height="448" fill="#08090c"/>
+  <rect width="1152" height="492" fill="#08090c"/>
   <g transform="translate(12,12)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_0)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_0)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_0)">01</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_0)" stroke-width="2"/>
@@ -55,11 +55,12 @@
   <rect x="24" y="116" width="103" height="24" rx="12" fill="#E2001A"/>
   <text x="75.5" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">tech-lead</text>
   <text x="139" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">strongest tier</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Calls strategy from the pit wall —</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">plans, delegates, sequences, reviews.</text></g>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_0)">Race Engineer</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Calls strategy from the pit wall —</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">plans, delegates, sequences, reviews.</text></g>
 <g transform="translate(396,12)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_1)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_1)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_1)">02</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_1)" stroke-width="2"/>
@@ -69,11 +70,12 @@
   <rect x="24" y="116" width="112" height="24" rx="12" fill="#E2001A"/>
   <text x="80" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">senior-dev</text>
   <text x="148" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">strong tier</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">The hard calls — architecture, security,</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">schema, concurrency, risky diffs.</text></g>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_1)">Technical Director</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">The hard calls — architecture, security,</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">schema, concurrency, risky diffs.</text></g>
 <g transform="translate(780,12)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_2)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_2)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_2)">03</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_2)" stroke-width="2"/>
@@ -83,11 +85,12 @@
   <rect x="24" y="116" width="121" height="24" rx="12" fill="#E2001A"/>
   <text x="84.5" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">implementer</text>
   <text x="157" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">mid tier</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Well-scoped parts, fast — endpoints,</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">DTOs, UI, state wiring, tests.</text></g>
-<g transform="translate(12,236)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_3)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_2)">Race Mechanic</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Well-scoped parts, fast — endpoints,</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">DTOs, UI, state wiring, tests.</text></g>
+<g transform="translate(12,258)">
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_3)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_3)">04</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_3)" stroke-width="2"/>
@@ -97,11 +100,12 @@
   <rect x="24" y="116" width="121" height="24" rx="12" fill="#E2001A"/>
   <text x="84.5" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">boilerplate</text>
   <text x="157" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">cheapest tier</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Fast mechanical work — configs, shells,</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">fixtures, renames. Capped; fails loud.</text></g>
-<g transform="translate(396,236)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_4)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_3)">Tyre Technician</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Fast mechanical work — configs, shells,</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">fixtures, renames. Capped; fails loud.</text></g>
+<g transform="translate(396,258)">
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_4)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_4)">05</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_4)" stroke-width="2"/>
@@ -111,11 +115,12 @@
   <rect x="24" y="116" width="138" height="24" rx="12" fill="#E2001A"/>
   <text x="93" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">code-reviewer</text>
   <text x="174" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">inspect-only</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Reads the diff; reports file:line</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">findings by severity. Never edits.</text></g>
-<g transform="translate(780,236)">
-  <rect x="1" y="1" width="358" height="198" rx="14" fill="url(#card_5)" stroke="#2a2d33" stroke-width="1.5"/>
-  <rect x="1" y="1" width="6" height="198" rx="3" fill="#E2001A"/>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_4)">FIA Scrutineer</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Reads the diff; reports file:line</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">findings by severity. Never edits.</text></g>
+<g transform="translate(780,258)">
+  <rect x="1" y="1" width="358" height="220" rx="14" fill="url(#card_5)" stroke="#2a2d33" stroke-width="1.5"/>
+  <rect x="1" y="1" width="6" height="220" rx="3" fill="#E2001A"/>
   <rect x="20" y="20" width="196" height="3" fill="#E2001A"/>
   <text x="24" y="70" font-family="Arial,sans-serif" font-style="italic" font-weight="800" font-size="52" fill="url(#gold_5)">06</text>
   <circle cx="328" cy="34" r="18" fill="#0d0d0f" stroke="url(#gold_5)" stroke-width="2"/>
@@ -125,7 +130,8 @@
   <rect x="24" y="116" width="95" height="24" rx="12" fill="#E2001A"/>
   <text x="71.5" y="133" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-weight="700" font-size="14" fill="#ffffff">debugger</text>
   <text x="131" y="133" font-family="'SF Mono',Menlo,monospace" font-size="12" fill="#FFC400">as needed</text>
-  <text x="24" y="165" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Reads the trace to root-cause faults —</text>
-  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">reproduces, isolates, minimal fix.</text></g>
+  <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-style="italic" font-weight="700" font-size="14" fill="url(#gold_5)">Telemetry Engineer</text>
+  <text x="24" y="183" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">Reads the trace to root-cause faults —</text>
+  <text x="24" y="201" font-family="Arial,Helvetica,sans-serif" font-size="12.5" fill="#aab0b8">reproduces, isolates, minimal fix.</text></g>
 
 </svg>

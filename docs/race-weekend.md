@@ -3,6 +3,22 @@
 One complete feature from idea to merge, told in F1 terms. Every step has
 the actual command to run. Read this once; the metaphor will stick.
 
+## The weekend at a glance
+
+| F1 phase | Dev phase | Who | Command |
+|---|---|---|---|
+| **Free practice** | Exploration / spike | Unrouted session | `/bearings` |
+| **Qualifying** | Planning pass | `tech-lead` | brief it with the feature request |
+| **Race engineer radio** | Briefing the worker | `tech-lead` → worker | the task brief itself |
+| **Pit stop** | Delegation | `implementer`, `boilerplate`, `senior-dev` | delegation chain |
+| **Safety car** | Wedged task | you | `pit-wall.sh attach <id>` |
+| **Parc fermé** | Review gate | `code-reviewer` | read-only diff review |
+| **Chequered flag** | Merge to main | `tech-lead` | `git push` → PR → merge |
+| **Post-race debrief** | Learnings curation | `learnings-curator` | `/learnings-curator` |
+| **Between-race testing** | Benchmarks | — | `node benchmarks/run.mjs` |
+
+The rest of this page walks each phase in order.
+
 ---
 
 ## Friday — Free practice: orient yourself

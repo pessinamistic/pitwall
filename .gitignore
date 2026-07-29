@@ -23,3 +23,11 @@ TECH_LEAD_HANDOFF.md
 
 # bearings status snapshots — regenerated on demand, not shared history
 .agents/bearings-*.md
+
+# ephemeral worktrees created by the concurrent-session isolation policy
+.claude/worktrees/
+
+# scratch output from image-generation sessions. The real assets live in
+# assets/generated/ (committed, human-reviewed) — see docs/visual-identity.md §5.
+sample_*_image_*.jpg
+generated-images/

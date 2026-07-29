@@ -158,8 +158,25 @@ Then start `opencode` in any project and select the `tech-lead` agent (it
 registers as a primary agent) — hand it a multi-step feature request and let
 it delegate. Small single edits are cheaper done directly with a worker.
 
-For a complete walkthrough of a feature from `cd` to merge, mapped to the
-F1 race weekend metaphor: [docs/race-weekend.md](docs/race-weekend.md).
+### When does what happen
+
+The roster above says *who* does what. A race weekend has a fixed cadence
+that says *when*:
+
+| F1 phase | Dev phase | Who |
+|---|---|---|
+| **Free practice** | Exploration / spike | Unrouted session, or `/bearings` |
+| **Qualifying** | Planning pass | `tech-lead` decomposes and briefs |
+| **Race engineer radio** | Briefing the worker | The task brief itself |
+| **Pit stop** | Delegation to a worker | `implementer`, `boilerplate`, `senior-dev` |
+| **Safety car** | Blocked / wedged task | Fleet `WEDGED` status → human intervention |
+| **Parc fermé / scrutineering** | Review gate | `code-reviewer` |
+| **Chequered flag** | Merge to main | `tech-lead` signs off |
+| **Post-race debrief** | Learnings curation | `/learnings-curator` |
+| **Between-race testing** | Benchmark harness | `benchmarks/run.mjs` |
+
+For a complete walkthrough of a feature from `cd` to merge, with the actual
+command at every step: [docs/race-weekend.md](docs/race-weekend.md).
 
 ## Fleet mode (optional)
 
