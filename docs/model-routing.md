@@ -5,7 +5,7 @@ and the exact procedure for filling in the work profile.
 
 ## Why routing lives in config, not agent frontmatter
 
-The six agent prompts have to run on two machines with **disjoint model
+The seven agent prompts have to run on two machines with **disjoint model
 sets**: a work machine where GitHub Copilot provides the models, and a
 personal machine running local Ollama plus OpenCode's free `opencode/*`
 models. Neither environment gets to be the one that "really" works while the
@@ -28,7 +28,7 @@ ID, check the replacement still satisfies the comment, and you never need to
 open an agent file to reason about routing.
 
 A second payoff: acting on a benchmark result (see below) is a one-line
-config edit instead of a sweep through six agent files.
+config edit instead of a sweep through seven agent files.
 
 ## Tier intents
 
@@ -38,6 +38,7 @@ occupants of each tier on a given machine.
 | Role | Tier intent | Why |
 |---|---|---|
 | `tech-lead` | strongest available | Planning and routing quality dominates total cost. The tech lead reads the docs, holds the task plan, and reads every worker report — a bad decomposition or a vague brief multiplies every downstream token. Do not economize here. |
+| `architect` | strongest available | Whole-system and cross-service design — service boundaries, API/event contracts, data-model and technology choices — is the highest-leverage reasoning and gates everything built after it. |
 | `senior-dev` | large / strong mid | Design, security, schema, and concurrency work needs depth and tolerates latency. |
 | `implementer` | code-tuned mid | Well-briefed feature work; a code-specialized mid-size model is fast and sufficient when the brief carries the thinking. |
 | `boilerplate` | cheapest available | Mechanical work only. Deliberately not the same model as `implementer` — if the cheapest model can't do a task, the task was misrouted, and the 20-step cap makes that fail loudly instead of expensively. |
@@ -55,6 +56,7 @@ authoring machine, and `validate.mjs` re-verifies them live whenever the
 | Role | Model | Tier |
 |---|---|---|
 | `tech-lead` | `opencode/big-pickle` | strongest |
+| `architect` | `opencode/big-pickle` | strongest |
 | `senior-dev` | `ollama/qwen3.5:27b` | large — **remote Ollama host** |
 | `implementer` | `ollama-local/qwen2.5-coder:7b` | code-tuned mid |
 | `boilerplate` | `ollama-local/gemma2:2b` | cheapest |
@@ -93,11 +95,11 @@ point is that Copilot model IDs cannot be verified anywhere else.
    character-for-character from the `opencode models` output are valid.
 
 3. **Map IDs to tiers, not to fame.** Fill each slot with a model that
-   satisfies the tier comment on its line — strongest for `tech-lead`, a
-   strong mid for `senior-dev`, a code-tuned mid for `implementer`, the
-   cheapest for `boilerplate` and `plan`, a reasoning-tuned model for
-   `code-reviewer` and `debugger`. There are eight `TODO` slots: the
-   top-level `model`, the six agents, and `plan`.
+   satisfies the tier comment on its line — strongest for `tech-lead` and
+   `architect`, a strong mid for `senior-dev`, a code-tuned mid for
+   `implementer`, the cheapest for `boilerplate` and `plan`, a
+   reasoning-tuned model for `code-reviewer` and `debugger`. There are nine
+   `TODO` slots: the top-level `model`, the seven agents, and `plan`.
 
 4. **Validate.** From the repo root:
 
@@ -135,13 +137,14 @@ Code runs on a fixed subscription model set — the same aliases on every
 machine — so there is nothing per-machine to route: each mirror carries a
 `model:` alias pinned at generation time from the `CLAUDE_MODEL_BY_AGENT`
 tier map in `scripts/sync-agents.mjs` (`fable` for `tech-lead` and
-`senior-dev`, `sonnet` for `implementer`/`code-reviewer`/`debugger`,
-`haiku` for `boilerplate`). Aliases are used instead of dated model IDs so
+`senior-dev`, `opus` for `architect`, `sonnet` for
+`implementer`/`code-reviewer`/`debugger`, `haiku` for `boilerplate`).
+Aliases are used instead of dated model IDs so
 the mirrors don't rot as versions roll forward.
 
 The source `agents/*.md` files stay model-free — that invariant is
 unchanged and still enforced — and the OpenCode profiles have no effect on
-mirror models. `validate.mjs` asserts the tier map covers exactly the six
+mirror models. `validate.mjs` asserts the tier map covers exactly the seven
 agents, because a missing entry would mean that mirror defaults to
 `model: inherit`, i.e. the caller's (most expensive) model — the same
 footgun described below, on the Claude Code side. To change a mirror's
@@ -164,7 +167,7 @@ files deliberately carry no `model:` key, **the profile is the only thing
 standing between you and every mechanical task running on the tech lead's
 model**. Three defenses:
 
-1. `node scripts/validate.mjs` asserts every one of the six agents has a
+1. `node scripts/validate.mjs` asserts every one of the seven agents has a
    non-empty `model` entry in **both** profiles and fails loudly otherwise.
    Run it after every hand-edit of a profile — and after any hand-edit of
    `~/.config/opencode/opencode.jsonc`, because a partially-merged config

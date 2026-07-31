@@ -28,8 +28,8 @@ renders a live "pit wall" board. Lives entirely in `scripts/fleet/`; needs
 ## Commands
 
 All commands go through `scripts/fleet/pit-wall.sh` (`FLEET_ROLES`:
-`tech-lead`, `senior-dev`, `implementer`, `boilerplate`, `code-reviewer`,
-`debugger`):
+`tech-lead`, `architect`, `senior-dev`, `implementer`, `boilerplate`,
+`code-reviewer`, `debugger`):
 
 ### Backends
 
@@ -105,13 +105,13 @@ standalone." That was wrong, and silently so: `opencode run --agent <name>`
 (confirmed against opencode 1.17.18 on the authoring machine, via `opencode
 run --help` / `opencode agent --help` and live testing — there is no flag
 to force it) requires a **primary**-mode agent for a top-level CLI
-invocation. Of the six roles, only `agents/tech-lead.md` is `mode: primary`
-— the other five are `mode: subagent` by design (that's the enforcement
+invocation. Of the seven roles, only `agents/tech-lead.md` is `mode: primary`
+— the other six are `mode: subagent` by design (that's the enforcement
 mechanism for in-session tech-lead → worker delegation; see the root
 README's ["How orchestration is
 enforced"](../README.md#how-orchestration-is-enforced), and it is
 deliberately **not** changed for fleet mode's sake). Before this was fixed,
-spawning any of those five under the opencode backend printed:
+spawning any of those six under the opencode backend printed:
 
 ```
 ! agent "boilerplate" is a subagent, not a primary agent. Falling back to default agent
@@ -125,8 +125,9 @@ one easy-to-miss warning line as a clue.
 **The fix:** `agents/*.md` are never edited for this. Instead,
 `node scripts/sync-fleet-agents.mjs` generates a `mode: primary` copy of
 each role under `agents/fleet/fleet-<role>.md` — `fleet-tech-lead`,
-`fleet-senior-dev`, `fleet-implementer`, `fleet-boilerplate`,
-`fleet-code-reviewer`, `fleet-debugger` — and `scripts/fleet/lib/common.sh`'s
+`fleet-architect`, `fleet-senior-dev`, `fleet-implementer`,
+`fleet-boilerplate`, `fleet-code-reviewer`, `fleet-debugger` — and
+`scripts/fleet/lib/common.sh`'s
 `fleet_build_launch_cmd` targets that name instead of the bare role name
 for the `opencode` backend (the `antigravity` backend targets its `<role>`
 custom agents directly and needed no such `fleet-` rename — Antigravity has
@@ -170,7 +171,7 @@ necessary** (both confirmed empirically, not assumed):
   global directory is a reliable discovery path for fleet mode's actual
   usage pattern. `scripts/install.sh`'s `opencode` step therefore
   additionally symlinks `agents/fleet/*.md` into
-  `~/.config/opencode/agents/`, flat, alongside the six primary agents.
+  `~/.config/opencode/agents/`, flat, alongside the seven primary agents.
 - OpenCode's `config/opencode.<profile>.jsonc` `agent.<name>.model`
   routing is keyed by the *exact* invoked agent identifier — confirmed by
   adding a temporary `agent["<scratch-name>"].model` entry to a live merged
@@ -179,7 +180,7 @@ necessary** (both confirmed empirically, not assumed):
   to a same-role entry under a different name. So `agent.fleet-<role>`
   does **not** inherit `agent.<role>`'s entry just because the two share a
   body, and both `config/opencode.personal.jsonc` and
-  `config/opencode.work.jsonc` carry a `fleet-<role>` entry for all six
+  `config/opencode.work.jsonc` carry a `fleet-<role>` entry for all seven
   roles, each a deliberate 1:1 mirror of its non-fleet counterpart (see
   docs/model-routing.md for the tier reasoning itself, which is unchanged).
 

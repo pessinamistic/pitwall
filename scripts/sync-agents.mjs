@@ -38,10 +38,11 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // the top tier here. If an org's model allowlist excludes it, Claude Code
 // documented behavior is to skip the value and run on the inherited model.
 //
-// validate.mjs asserts this map covers exactly the six agents, so a
-// seventh agent can't silently ship an untier'd (inherit-model) mirror.
+// validate.mjs asserts this map covers exactly the seven agents, so an
+// eighth agent can't silently ship an untier'd (inherit-model) mirror.
 export const CLAUDE_MODEL_BY_AGENT = {
   'tech-lead': 'opus',       // strongest — planning/routing quality dominates cost
+  'architect': 'opus',        // strongest — whole-system design, contracts other work builds on
   'senior-dev': 'sonnet',      // strongest — design, security, schema, concurrency
   'implementer': 'sonnet',    // mid — well-briefed feature work
   'boilerplate': 'haiku',     // cheapest — mechanical work only

@@ -41,7 +41,10 @@ or writing anything:
   if you think one is needed, stop and report back instead of adding it.
 - If the task requires a design decision the docs don't answer, make the
   smallest reasonable choice, flag it explicitly in your report, and keep it
-  easy to reverse.
+  easy to reverse. You own the hard parts WITHIN an already-agreed design;
+  a decision that's whole-system, cross-service, or contract-defining
+  belongs to `architect` — flag it to the tech lead rather than deciding it
+  yourself.
 - Respect licenses: never paste in code or content the task brief doesn't
   authorize; preserve attribution requirements the project has.
 

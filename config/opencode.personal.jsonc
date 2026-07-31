@@ -11,6 +11,7 @@
 
   "agent": {
     "tech-lead":     { "model": "opencode/big-pickle" },              // strongest
+    "architect":     { "model": "opencode/big-pickle" },              // strongest — whole-system design
     "senior-dev":    { "model": "ollama/qwen3.5:27b" },               // large — remote Ollama host — see your provider config
     "implementer":   { "model": "ollama-local/qwen2.5-coder:7b" },    // mid, code-tuned
     "boilerplate":   { "model": "ollama-local/gemma2:2b" },           // cheapest
@@ -30,6 +31,7 @@
     // deliberate 1:1 mirror of its non-fleet counterpart above — keep them
     // in sync if you change one.
     "fleet-tech-lead":     { "model": "opencode/big-pickle" },
+    "fleet-architect":     { "model": "opencode/big-pickle" },
     "fleet-senior-dev":    { "model": "ollama/qwen3.5:27b" },
     "fleet-implementer":   { "model": "ollama-local/qwen2.5-coder:7b" },
     "fleet-boilerplate":   { "model": "ollama-local/gemma2:2b" },

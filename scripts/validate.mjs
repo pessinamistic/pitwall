@@ -121,13 +121,13 @@ function validateAgents() {
 
   for (const expected of TEAM_ROLES) {
     if (!namesFound.has(expected)) {
-      error(`agents/${expected}.md is missing (see the six-agent roster in README.md).`);
+      error(`agents/${expected}.md is missing (see the roster in README.md).`);
     }
   }
   for (const name of namesFound) {
     if (!TEAM_ROLES.includes(name)) {
       error(
-        `agents/${name}.md is not one of the six agents this repo specifies ` +
+        `agents/${name}.md is not one of the agents this repo specifies ` +
           `(see README.md): ${TEAM_ROLES.join(', ')}.`
       );
     }
@@ -563,7 +563,7 @@ function validateNoLeakedPaths() {
 
 // ---------------------------------------------------------------------
 // Claude Code mirror tier map (CLAUDE_MODEL_BY_AGENT in sync-agents.mjs)
-// must cover exactly the six agents — a missing entry would make
+// must cover exactly the roster — a missing entry would make
 // sync-agents.mjs fail at generation time, and an extra entry means a
 // renamed/removed agent left a stale tier behind. Alias values must be
 // ones the Claude Code subagent `model:` field documents.
@@ -585,7 +585,7 @@ function validateClaudeTierMap() {
     if (!TEAM_ROLES.includes(name)) {
       error(
         `sync-agents.mjs: CLAUDE_MODEL_BY_AGENT has an entry for "${name}", which is not ` +
-          `one of the six agents — remove the stale entry or add agents/${name}.md.`
+          `one of the roster's agents — remove the stale entry or add agents/${name}.md.`
       );
     }
     const alias = CLAUDE_MODEL_BY_AGENT[name];
@@ -740,7 +740,7 @@ function validateCodexGeneratedFiles() {
 function validateAgentsMd() {
   const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');
   if (!fs.existsSync(agentsMd)) {
-    error('AGENTS.md is missing at the repo root — Codex reads it as shared policy for the six roles.');
+    error('AGENTS.md is missing at the repo root — Codex reads it as shared policy for the roster.');
     return;
   }
   const content = fs.readFileSync(agentsMd, 'utf8');
@@ -771,7 +771,7 @@ function validateCodex() {
 // each file in-memory via the generator's own exported buildAgentMd() +
 // ANTIGRAVITY_MODEL_BY_AGENT and compare byte-for-byte, so a hand-edited or
 // stale committed file both fail. Also asserts the ANTIGRAVITY_MODEL_BY_AGENT
-// tier map covers exactly the six roles with a confirmed tier value (same
+// tier map covers exactly the roster with a confirmed tier value (same
 // guard pattern as validateClaudeTierMap above), and that each committed
 // file lives in its own dedicated <role>/ subdirectory (the discovery
 // gotcha documented in antigravity/README.md).
@@ -791,7 +791,7 @@ function validateAntigravityTierMap() {
     if (!TEAM_ROLES.includes(name)) {
       error(
         `sync-antigravity-agents.mjs: ANTIGRAVITY_MODEL_BY_AGENT has an entry for "${name}", ` +
-          `which is not one of the six agents — remove the stale entry or add agents/${name}.md.`
+          `which is not one of the roster's agents — remove the stale entry or add agents/${name}.md.`
       );
     }
     const tier = ANTIGRAVITY_MODEL_BY_AGENT[name];
