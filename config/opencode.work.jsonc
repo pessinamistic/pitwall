@@ -22,6 +22,7 @@
 
   "agent": {
     "tech-lead":     { "model": "github-copilot/claude-sonnet-5" }, // strongest available
+    "architect":     { "model": "github-copilot/claude-sonnet-5" }, // strongest available — whole-system design
     "senior-dev":    { "model": "github-copilot/claude-sonnet-4.6" }, // strong mid
     "implementer":   { "model": "github-copilot/claude-sonnet-4.5" }, // code-tuned mid
     "boilerplate":   { "model": "github-copilot/claude-haiku-4.5" }, // cheapest available
@@ -40,6 +41,7 @@
     // entry here. Every value below is a deliberate 1:1 mirror of its
     // non-fleet counterpart above — keep them in sync if you change one.
     "fleet-tech-lead":     { "model": "github-copilot/claude-sonnet-5" },
+    "fleet-architect":     { "model": "github-copilot/claude-sonnet-5" },
     "fleet-senior-dev":    { "model": "github-copilot/claude-sonnet-4.6" },
     "fleet-implementer":   { "model": "github-copilot/claude-sonnet-4.5" },
     "fleet-boilerplate":   { "model": "github-copilot/claude-haiku-4.5" },

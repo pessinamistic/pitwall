@@ -17,6 +17,7 @@
   // bigger model), cheapest -> boilerplate.
   "agent": {
     "tech-lead":     { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
+    "architect":     { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible — whole-system design
     "senior-dev":    { "model": "gpt-5.5",       "model_reasoning_effort": "high" },   // strongest visible
     "implementer":   { "model": "gpt-5.6-terra", "model_reasoning_effort": "medium" }, // balanced mid
     "boilerplate":   { "model": "gpt-5.6-luna",  "model_reasoning_effort": "low" },    // cheapest

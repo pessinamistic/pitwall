@@ -43,10 +43,13 @@ export const ANTIGRAVITY_MODEL_TIERS = ['flash', 'pro', 'inherit'];
 // pre-existing antigravity/rules/engineering-team.md mapping (already
 // confirmed-safe — every role there was already pro/inherit/flash, never
 // the unconfirmed flash_lite). validate.mjs asserts this map covers exactly
-// the six agents, same guard pattern as sync-agents.mjs's
-// CLAUDE_MODEL_BY_AGENT.
+// the seven agents, same guard pattern as sync-agents.mjs's
+// CLAUDE_MODEL_BY_AGENT. `architect` is a new hands-on top-tier role (see
+// agents/architect.md) — `pro` matches its Claude/OpenCode "strongest" tier
+// intent and is a confirmed-safe value (see the tier list above).
 export const ANTIGRAVITY_MODEL_BY_AGENT = {
   'tech-lead': 'pro',
+  'architect': 'pro',
   'senior-dev': 'pro',
   'implementer': 'inherit',
   'boilerplate': 'flash',
