@@ -1,8 +1,8 @@
 # Codex Engineering Team
 
-This repository defines a six-role engineering team. In Codex the roles are
+This repository defines a seven-role engineering team. In Codex the roles are
 **native custom agents**: the generated `.codex/agents/*.toml` files register
-all six by name, and Codex discovers them automatically when this project is
+all seven by name, and Codex discovers them automatically when this project is
 trusted. This file complements that registry with the shared orchestration
 policy — how the roles work together, whoever is playing them.
 
@@ -47,6 +47,7 @@ policy — how the roles work together, whoever is playing them.
 | Role | Use for | Do not use for |
 | --- | --- | --- |
 | `tech-lead` | Planning, decomposition, sequencing, review gates, consolidated status | Writing implementation code unless explicitly asked |
+| `architect` | Whole-system & cross-service design: service boundaries, API/event contracts between services, data-model & technology selection, ADRs; builds the foundational skeleton | Implementation within an already-agreed design (that is senior-dev), or single-service builds |
 | `senior-dev` | Architecture, security, migrations, messaging, caches, concurrency, risky-diff review | Pure mechanical work |
 | `implementer` | Fully specified feature work, standard tests, UI following the existing system, CI/Docker changes | Undecided architecture, security configuration, or schema design |
 | `boilerplate` | Repetitive config, fixtures, DTO/entity shells, renames, and other zero-judgment edits | Business logic or dependency/design choices |

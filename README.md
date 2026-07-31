@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="Scuderia — six roles, one pit wall; delegate, build, verify" width="100%">
+<img src="assets/banner.svg" alt="Scuderia — seven roles, one pit wall; delegate, build, verify" width="100%">
 
 # Scuderia
 
-**Six roles, one pit wall.** &nbsp;·&nbsp; *Essere Ferrari.*
+**Seven roles, one pit wall.** &nbsp;·&nbsp; *Essere Ferrari.*
 
 [![license](https://img.shields.io/badge/license-MIT-FFC400?style=flat-square)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/pessinamistic/pitwall/ci.yml?style=flat-square&label=CI&color=00913A)](.github/workflows/ci.yml)
@@ -15,20 +15,20 @@
 </div>
 
 An orchestrated engineering team for [OpenCode](https://opencode.ai): a
-`tech-lead` agent that plans and delegates, five worker agents that execute,
+`tech-lead` agent that plans and delegates, six worker agents that execute,
 and per-role model routing that puts each role on the cheapest model that can
-do its job. The same six roles are also available as native agents in
+do its job. The same seven roles are also available as native agents in
 [Codex](#codex) and as mirrored subagents in Claude Code, all generated from
 one set of source prompts. The skills the team relies on are shared across
 OpenCode and Claude Code from a single directory, and a benchmark harness
 lets you tune routing from data instead of vibes.
 
-Three things make this more than six prompt files:
+Three things make this more than seven prompt files:
 
 - **Orchestration is enforced by permissions, not prose.** The hierarchy is
   wired into OpenCode's `permission` config, so it holds even when the model
   would rather freelance.
-- **Model routing lives in config profiles, not agent files.** The same six
+- **Model routing lives in config profiles, not agent files.** The same seven
   prompts run unmodified on a GitHub Copilot machine and on a local
   Ollama machine — only the routing table differs.
 - **Briefs are the primary cost optimization.** The tech lead's delegation
@@ -45,12 +45,13 @@ the hard calls, and a garage crew that executes.
 ## The team
 
 <div align="center">
-<img src="assets/roster.svg" alt="The six roles — tech-lead (Race Engineer), senior-dev (Technical Director), implementer (Mechanic), boilerplate (Tyre Tech), code-reviewer (Scrutineer), debugger (Telemetry Engineer)" width="100%">
+<img src="assets/roster.svg" alt="The seven roles — tech-lead (Race Engineer), architect (Chief Designer), senior-dev (Technical Director), implementer (Mechanic), boilerplate (Tyre Tech), code-reviewer (Scrutineer), debugger (Telemetry Engineer)" width="100%">
 </div>
 
 | Agent           | F1 Title             | Role                                                                                                                       | Tier intent         | The tech lead routes here when…                                                                                  |
 |-----------------|----------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|------------------------------------------------------------------------------------------------------------------|
 | `tech-lead`     | Race Engineer        | Primary orchestrator: decomposes requests, writes briefs, sequences work, enforces review, reports status                  | strongest available | — (this is the entry point; every multi-step request starts here)                                                |
+| `architect`     | Chief Designer       | Whole-system & cross-service design: service boundaries, API/event contracts between services, data-model & technology selection, ADRs; builds the foundational cross-cutting skeleton | strongest available | a change needs a whole-system or cross-service design decided before it can be delegated — a service boundary, an API/event contract, or a technology choice |
 | `senior-dev`    | Technical Director   | Design, security config, schema/migrations, messaging, caching, concurrency; reviews risky diffs                           | large / strong mid  | the task needs judgment: architecture, auth, schema design, async pipelines, or an architectural read on a diff  |
 | `implementer`   | Race Mechanic        | Well-scoped feature work: CRUD endpoints, DTOs/mappers, UI from the existing design system, standard tests, Docker/CI yaml | code-tuned mid      | the task is fully specified and needs no design decisions — it stops and punts if one appears                    |
 | `boilerplate`   | Tyre Technician      | Mechanical work: config files, entity/DTO shells, fixtures, renames, repetitive near-identical files                       | cheapest available  | there is zero judgment involved; capped at 20 agentic steps so a misroute fails loudly instead of burning budget |
@@ -62,7 +63,7 @@ the hard calls, and a garage crew that executes.
 The hierarchy is config, not a request in English:
 
 - **`tech-lead` has a `permission.task` allowlist** (`"*": deny` first, then
-  the five workers allowed). Denied subagents are stripped from the Task tool
+  the six workers allowed). Denied subagents are stripped from the Task tool
   entirely — the model never sees them, rather than politely declining them.
 - **Every worker has `task: deny`** — no worker can delegate, so an
   implementer can never spawn another implementer and compound the token
@@ -247,6 +248,7 @@ accepts no longer affects the mirrors at all, it is kept only so
 | Role(s) | Alias | Tier |
 |---|---|---|
 | `tech-lead`, `senior-dev` | `fable` | strongest |
+| `architect` | `opus` | strongest |
 | `implementer`, `code-reviewer`, `debugger` | `sonnet` | mid |
 | `boilerplate` | `haiku` | cheapest |
 
@@ -259,7 +261,7 @@ dropped, with a comment in the generated file noting exactly what was
 dropped and why.
 
 The parallel footgun on this side: `validate.mjs` asserts
-`CLAUDE_MODEL_BY_AGENT` covers exactly the six agents. A role missing from
+`CLAUDE_MODEL_BY_AGENT` covers exactly the seven agents. A role missing from
 that map would generate a mirror with no `model:` line — Claude Code's
 documented behavior for an omitted model is `inherit`, i.e. run on the
 *caller's* model, the same silent-maximum-spend failure mode as the
@@ -273,7 +275,7 @@ discovered automatically once a project is trusted. This repo generates one
 TOML per role from the same `agents/*.md` sources that drive OpenCode and
 the Claude Code mirrors: one set of prompts, three platforms.
 
-**Quickstart:** open this repo in Codex CLI and trust it — the six agents
+**Quickstart:** open this repo in Codex CLI and trust it — the seven agents
 just work, since `.codex/agents/*.toml` ship already generated and current.
 Ask Codex to delegate (e.g. "spawn code-reviewer on this diff"); Codex picks
 custom agents by their `description`, and `/agent` (not `/agents` — there is
@@ -385,6 +387,7 @@ is a one-line profile edit.
 ├── AGENTS.md                    # Codex-facing shared policy (roles, brief contract, review gate)
 ├── agents/                      # OpenCode agent definitions — the source of truth
 │   ├── tech-lead.md             # primary orchestrator
+│   ├── architect.md
 │   ├── senior-dev.md
 │   ├── implementer.md
 │   ├── boilerplate.md
@@ -408,7 +411,7 @@ is a one-line profile edit.
 │   ├── sync-codex-agents.mjs    # agents/ -> .codex/agents/*.toml (--profile, --check)
 │   ├── validate.mjs             # contract checks (--platform all|opencode|claude|codex)
 │   └── lib/                     # frontmatter/JSONC/TOML parsing, config merge
-│       ├── team.mjs             # the six-role roster, imported by every script above
+│       ├── team.mjs             # the seven-role roster, imported by every script above
 │       └── toml.mjs             # dependency-free TOML string encoder
 ├── benchmarks/
 │   ├── run.mjs                  # same prompt across models via `opencode run`
