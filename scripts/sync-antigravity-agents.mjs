@@ -87,7 +87,7 @@ const WRITE_RESTRICTION_NOTE = {
 const ANTIGRAVITY_DELEGATION_NOTE = {
   'tech-lead':
     '**Antigravity note — no live delegation:** this integration has no ' +
-    'in-session sub-agent invocation and no Task tool. The six team agents ' +
+    'in-session sub-agent invocation and no Task tool. The seven team agents ' +
     'are separate Antigravity custom agents that a human selects one at a ' +
     'time from the `/agents` panel — you cannot call a sibling agent from ' +
     'inside your own session, and any attempt (an `invoke_subagent`/' +
